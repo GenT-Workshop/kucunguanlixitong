@@ -48,6 +48,14 @@ class LoginViewTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertFalse(response.json()["success"])
 
+    def test_invalid_json_body_return_400(self) -> None:
+        response = self.client.post(
+            "/api/login", data="{not-json", content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()["success"])
+
     def test_non_post_request_not_allowed(self) -> None:
         response = self.client.get("/api/login")
 
