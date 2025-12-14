@@ -1,0 +1,554 @@
+openapi: 3.0.3
+info:
+  title: 库存管理系统 - 入库接口
+  description: 库存管理系统入库模块API接口文档
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://localhost:8000
+    description: 开发环境
+
+tags:
+  - name: Stock
+    description: 库存管理接口
+  - name: StockIn
+    description: 入库管理接口
+
+paths:
+  /api/stock/init/:
+    post:
+      tags:
+        - Stock
+      summary: 物料初始化
+      description: 初始化物料基本信息，创建库存记录
+      operationId: initStock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockInitRequest'
+            example:
+              material_code: "M001"
+              material_name: "螺丝钉"
+              max_stock: 10000
+              min_stock: 100
+              stock_value: 0.00
+      responses:
+        '200':
+          description: 物料初始化成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockResponse'
+              example:
+                code: 200
+                message: "物料初始化成功"
+                data:
+                  id: 1
+                  material_code: "M001"
+                  material_name: "螺丝钉"
+                  max_stock: 10000
+                  min_stock: 100
+                  current_stock: 0
+                  stock_value: "0.00"
+                  created_at: "2025-12-14T10:00:00Z"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "物料编号已存在"
+                data: null
+
+  /api/stock/:
+    get:
+      tags:
+        - Stock
+      summary: 获取库存列表
+      description: 获取所有库存物料列表，支持分页和搜索
+      operationId: getStockList
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: 搜索关键词（物料编号/名称）
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockListResponse'
+              example:
+                code: 200
+                message: "success"
+                data:
+                  total: 100
+                  page: 1
+                  page_size: 10
+                  list:
+                    - id: 1
+                      material_code: "M001"
+                      material_name: "螺丝钉"
+                      max_stock: 10000
+                      min_stock: 100
+                      current_stock: 500
+                      stock_value: "250.00"
+
+  /api/stock/{id}/:
+    get:
+      tags:
+        - Stock
+      summary: 获取库存详情
+      description: 根据ID获取单个库存物料详情
+      operationId: getStockDetail
+      parameters:
+        - name: id
+          in: path
+          description: 库存记录ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockDetailResponse'
+              example:
+                code: 200
+                message: "success"
+                data:
+                  id: 1
+                  material_code: "M001"
+                  material_name: "螺丝钉"
+                  max_stock: 10000
+                  min_stock: 100
+                  current_stock: 500
+                  stock_value: "250.00"
+                  created_at: "2025-12-14T10:00:00Z"
+                  updated_at: "2025-12-14T12:00:00Z"
+        '404':
+          description: 资源不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "库存记录不存在"
+                data: null
+
+  /api/stock-in/:
+    post:
+      tags:
+        - StockIn
+      summary: 创建入库记录
+      description: 创建物料入库记录，同时更新库存表中的当前库存量和库存价值
+      operationId: createStockIn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockInCreateRequest'
+            example:
+              material_code: "M001"
+              in_quantity: 100
+              in_value: 50.00
+              in_time: "2025-12-14T14:30:00Z"
+      responses:
+        '200':
+          description: 入库成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockInResponse'
+              example:
+                code: 200
+                message: "入库成功"
+                data:
+                  id: 1
+                  material_code: "M001"
+                  material_name: "螺丝钉"
+                  in_time: "2025-12-14T14:30:00Z"
+                  in_quantity: 100
+                  in_value: "50.00"
+                  created_at: "2025-12-14T14:30:00Z"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                material_not_found:
+                  summary: 物料不存在
+                  value:
+                    code: 400
+                    message: "物料编号不存在，请先初始化物料"
+                    data: null
+                exceed_max_stock:
+                  summary: 超过最大库存量
+                  value:
+                    code: 400
+                    message: "入库后将超过最大库存量"
+                    data: null
+    get:
+      tags:
+        - StockIn
+      summary: 获取入库记录列表
+      description: 获取入库记录列表，支持分页、搜索和时间筛选
+      operationId: getStockInList
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: 搜索关键词（物料编号/名称）
+          required: false
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: 开始时间
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: end_time
+          in: query
+          description: 结束时间
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockInListResponse'
+              example:
+                code: 200
+                message: "success"
+                data:
+                  total: 50
+                  page: 1
+                  page_size: 10
+                  list:
+                    - id: 1
+                      material_code: "M001"
+                      material_name: "螺丝钉"
+                      in_time: "2025-12-14T14:30:00Z"
+                      in_quantity: 100
+                      in_value: "50.00"
+
+  /api/stock-in/{id}/:
+    get:
+      tags:
+        - StockIn
+      summary: 获取入库记录详情
+      description: 根据ID获取单条入库记录详情
+      operationId: getStockInDetail
+      parameters:
+        - name: id
+          in: path
+          description: 入库记录ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockInDetailResponse'
+              example:
+                code: 200
+                message: "success"
+                data:
+                  id: 1
+                  material_code: "M001"
+                  material_name: "螺丝钉"
+                  in_time: "2025-12-14T14:30:00Z"
+                  in_quantity: 100
+                  in_value: "50.00"
+                  created_at: "2025-12-14T14:30:00Z"
+        '404':
+          description: 资源不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "入库记录不存在"
+                data: null
+
+components:
+  schemas:
+    # 请求模型
+    StockInitRequest:
+      type: object
+      required:
+        - material_code
+        - material_name
+      properties:
+        material_code:
+          type: string
+          maxLength: 50
+          description: 物料编号
+        material_name:
+          type: string
+          maxLength: 100
+          description: 物料名称
+        max_stock:
+          type: integer
+          default: 0
+          description: 最大库存量
+        min_stock:
+          type: integer
+          default: 0
+          description: 最小库存量
+        stock_value:
+          type: number
+          format: decimal
+          default: 0.00
+          description: 初始库存价值
+
+    StockInCreateRequest:
+      type: object
+      required:
+        - material_code
+        - in_quantity
+        - in_value
+      properties:
+        material_code:
+          type: string
+          maxLength: 50
+          description: 物料编号
+        in_quantity:
+          type: integer
+          description: 入库数量
+        in_value:
+          type: number
+          format: decimal
+          description: 入库价值
+        in_time:
+          type: string
+          format: date-time
+          description: 入库时间，默认当前时间
+
+    # 响应模型
+    Stock:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 主键ID
+        material_code:
+          type: string
+          description: 物料编号
+        material_name:
+          type: string
+          description: 物料名称
+        max_stock:
+          type: integer
+          description: 最大库存量
+        min_stock:
+          type: integer
+          description: 最小库存量
+        current_stock:
+          type: integer
+          description: 当前库存量
+        stock_value:
+          type: string
+          description: 库存价值
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    StockIn:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 主键ID
+        material_code:
+          type: string
+          description: 物料编号
+        material_name:
+          type: string
+          description: 物料名称
+        in_time:
+          type: string
+          format: date-time
+          description: 入库时间
+        in_quantity:
+          type: integer
+          description: 入库数量
+        in_value:
+          type: string
+          description: 入库价值
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+
+    # 通用响应
+    StockResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+        message:
+          type: string
+          description: 响应消息
+        data:
+          $ref: '#/components/schemas/Stock'
+
+    StockListResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+        message:
+          type: string
+          description: 响应消息
+        data:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: 总记录数
+            page:
+              type: integer
+              description: 当前页码
+            page_size:
+              type: integer
+              description: 每页数量
+            list:
+              type: array
+              items:
+                $ref: '#/components/schemas/Stock'
+
+    StockDetailResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+        message:
+          type: string
+          description: 响应消息
+        data:
+          $ref: '#/components/schemas/Stock'
+
+    StockInResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+        message:
+          type: string
+          description: 响应消息
+        data:
+          $ref: '#/components/schemas/StockIn'
+
+    StockInListResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+        message:
+          type: string
+          description: 响应消息
+        data:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: 总记录数
+            page:
+              type: integer
+              description: 当前页码
+            page_size:
+              type: integer
+              description: 每页数量
+            list:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockIn'
+
+    StockInDetailResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+        message:
+          type: string
+          description: 响应消息
+        data:
+          $ref: '#/components/schemas/StockIn'
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 错误码
+        message:
+          type: string
+          description: 错误消息
+        data:
+          type: object
+          nullable: true
+          description: 返回数据（错误时为null）
