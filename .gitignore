@@ -6,3 +6,5 @@ db.sqlite3
 venv/
 .venv/
 *.log
+*/node_modules
+./frontend/node_modules
