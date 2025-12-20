@@ -69,3 +69,39 @@ export interface StockInListParams {
   start_time?: string
   end_time?: string
 }
+
+// 出库记录类型
+export interface StockOut {
+  id: number
+  material_code: string
+  material_name: string
+  out_time: string
+  out_quantity: number
+  out_value: string
+  out_type: 'production' | 'sales' | 'other'
+  out_type_display: string
+  operator: string
+  remark?: string
+  created_at: string
+}
+
+// 出库参数
+export interface StockOutCreateParams {
+  material_code: string
+  out_quantity: number
+  out_value: number
+  out_type: 'production' | 'sales' | 'other'
+  out_time?: string
+  operator?: string
+  remark?: string
+}
+
+// 出库列表查询参数
+export interface StockOutListParams {
+  page?: number
+  page_size?: number
+  search?: string
+  out_type?: string
+  start_time?: string
+  end_time?: string
+}

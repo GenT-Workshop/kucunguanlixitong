@@ -4,10 +4,13 @@ import type {
   PaginatedData,
   Stock,
   StockIn,
+  StockOut,
   StockInitParams,
   StockListParams,
   StockInCreateParams,
   StockInListParams,
+  StockOutCreateParams,
+  StockOutListParams,
 } from './types'
 
 // 是否使用 mock 数据（开发环境使用 mock，生产环境使用真实 API）
@@ -116,6 +119,52 @@ export async function getStockInDetail(id: number): Promise<ApiResponse<StockIn>
   return request<StockIn>(`/stock-in/${id}/`)
 }
 
+// ==================== 出库接口 ====================
+
+/**
+ * 创建出库记录
+ */
+export async function createStockOut(
+  params: StockOutCreateParams
+): Promise<ApiResponse<StockOut>> {
+  return request<StockOut>('/stock-out/create/', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  })
+}
+
+/**
+ * 获取出库记录列表
+ */
+export async function getStockOutList(
+  params: StockOutListParams = {}
+): Promise<ApiResponse<PaginatedData<StockOut>>> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.page_size) query.set('page_size', String(params.page_size))
+  if (params.search) query.set('search', params.search)
+  if (params.out_type) query.set('out_type', params.out_type)
+  if (params.start_time) query.set('start_time', params.start_time)
+  if (params.end_time) query.set('end_time', params.end_time)
+  return request<PaginatedData<StockOut>>(`/stock-out/?${query.toString()}`)
+}
+
+/**
+ * 获取出库记录详情
+ */
+export async function getStockOutDetail(id: number): Promise<ApiResponse<StockOut>> {
+  return request<StockOut>(`/stock-out/${id}/`)
+}
+
+/**
+ * 删除出库记录
+ */
+export async function deleteStockOut(id: number): Promise<ApiResponse<null>> {
+  return request<null>(`/stock-out/${id}/delete/`, {
+    method: 'DELETE',
+  })
+}
+
 // 导出所有接口
 export default {
   stockInit,
@@ -124,4 +173,8 @@ export default {
   createStockIn,
   getStockInList,
   getStockInDetail,
+  createStockOut,
+  getStockOutList,
+  getStockOutDetail,
+  deleteStockOut,
 }
