@@ -1,0 +1,355 @@
+.main {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 72px;
+  position: relative;
+  z-index: 1;
+}
+
+.leftSection {
+  flex: 0 0 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--spacing-3xl);
+  padding-left: var(--spacing-3xl);
+}
+
+.leftSection h1 {
+  margin-bottom: var(--spacing-md);
+}
+
+.heroSubtitle {
+  font-size: var(--font-size-5xl);
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: -2px;
+  margin-top: var(--spacing-sm);
+}
+
+.rightSection {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  padding-top: var(--spacing-2xl);
+}
+
+.navTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-right: var(--spacing-md);
+}
+
+.contentCard {
+  width: 100%;
+  max-width: 1200px;
+  padding: var(--spacing-xl);
+}
+
+/* 工具栏 */
+.toolbar {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.searchGroup {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.searchGroup input {
+  flex: 1;
+}
+
+.searchGroup button {
+  padding: var(--spacing-md);
+}
+
+.filterSelect {
+  width: 140px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.filterSelect option {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* 表格 */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  color: var(--text-secondary);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.emptyCell {
+  text-align: center !important;
+  color: var(--text-muted);
+  padding: var(--spacing-2xl) !important;
+}
+
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-3xl);
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.tag_production {
+  background: rgba(79, 140, 255, 0.2);
+  color: var(--accent-blue);
+}
+
+.tag_sales {
+  background: rgba(82, 196, 26, 0.2);
+  color: #52c41a;
+}
+
+.tag_other {
+  background: rgba(250, 173, 20, 0.2);
+  color: #faad14;
+}
+
+/* 删除按钮 */
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.deleteBtn:hover {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+}
+
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.totalText {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.pageButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.pageInfo {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* 弹窗表单 */
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.formRow {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.formRow .formGroup {
+  flex: 1;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.formGroup label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.formGroup select,
+.formGroup input,
+.formGroup textarea {
+  background: #0B0D12 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.formGroup select:focus,
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #4F8CFF !important;
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.3);
+}
+
+.formGroup select option {
+  background: #0B0D12;
+  color: #ffffff;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* 弹窗样式覆盖 - 使用 !important 确保覆盖 antd 默认样式 */
+:global(.ant-modal) .modal,
+.modal :global(.ant-modal-content) {
+  background: #0B0D12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+}
+
+.modal :global(.ant-modal-header) {
+  background: #0B0D12 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  padding: 16px 24px !important;
+}
+
+.modal :global(.ant-modal-body) {
+  background: #0B0D12 !important;
+  padding: 24px !important;
+}
+
+.modal :global(.ant-modal-title) {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+}
+
+.modal :global(.ant-modal-close) {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.modal :global(.ant-modal-close:hover) {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 音频波形动画 */
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 24px;
+}
+
+.waveBar {
+  width: 3px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 8px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 20px;
+    opacity: 1;
+  }
+}
+
+/* 响应式 */
+@media (max-width: 968px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .leftSection {
+    flex: none;
+    padding: var(--spacing-xl);
+    text-align: center;
+    align-items: center;
+  }
+
+  .rightSection {
+    padding: var(--spacing-md);
+  }
+
+  .toolbar {
+    flex-direction: column;
+  }
+
+  .searchGroup {
+    max-width: none;
+  }
+
+  .filterSelect {
+    width: 100%;
+  }
+}

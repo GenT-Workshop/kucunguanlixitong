@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python manage.py runserver:*)",
+      "Bash(source:*)",
+      "Bash(.venv/bin/python:*)",
+      "Bash(git reset:*)",
+      "Bash(git add:*)",
+      "Bash(git merge:*)",
+      "Bash(git checkout:*)",
+      "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\" \"D:/git workplace/backend/manage.py\" makemigrations)",
+      "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\" \"D:/git workplace/backend/manage.py\" showmigrations stock)",
+      "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\":*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

@@ -3,6 +3,8 @@ import { UserProvider } from './context/UserContext'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import StockIn from './pages/StockIn'
+import StockOut from './pages/StockOut'
 import './styles/theme.css'
 
 function App() {
@@ -14,6 +16,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/stock-in" element={<StockIn />} />
+          <Route path="/stock-out" element={<StockOut />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
