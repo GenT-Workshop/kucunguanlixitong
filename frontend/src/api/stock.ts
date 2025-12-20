@@ -61,6 +61,10 @@ export async function getStockList(
   if (params.page) query.set('page', String(params.page))
   if (params.page_size) query.set('page_size', String(params.page_size))
   if (params.search) query.set('search', params.search)
+  if (params.supplier) query.set('supplier', params.supplier)
+  if (params.category) query.set('category', params.category)
+  if (params.status) query.set('status', params.status)
+  if (params.stock_status) query.set('stock_status', params.stock_status)
   return request<PaginatedData<Stock>>(`/stock/?${query.toString()}`)
 }
 
@@ -104,6 +108,10 @@ export async function getStockInList(
   if (params.page) query.set('page', String(params.page))
   if (params.page_size) query.set('page_size', String(params.page_size))
   if (params.search) query.set('search', params.search)
+  if (params.in_type) query.set('in_type', params.in_type)
+  if (params.supplier) query.set('supplier', params.supplier)
+  if (params.bill_no) query.set('bill_no', params.bill_no)
+  if (params.operator) query.set('operator', params.operator)
   if (params.start_time) query.set('start_time', params.start_time)
   if (params.end_time) query.set('end_time', params.end_time)
   return request<PaginatedData<StockIn>>(`/stock-in/?${query.toString()}`)
@@ -117,6 +125,15 @@ export async function getStockInDetail(id: number): Promise<ApiResponse<StockIn>
     return mockApi.getStockInDetail(id) as Promise<ApiResponse<StockIn>>
   }
   return request<StockIn>(`/stock-in/${id}/`)
+}
+
+/**
+ * 删除/撤销入库记录
+ */
+export async function deleteStockIn(id: number): Promise<ApiResponse<null>> {
+  return request<null>(`/stock-in/${id}/delete/`, {
+    method: 'DELETE',
+  })
 }
 
 // ==================== 出库接口 ====================
@@ -144,6 +161,8 @@ export async function getStockOutList(
   if (params.page_size) query.set('page_size', String(params.page_size))
   if (params.search) query.set('search', params.search)
   if (params.out_type) query.set('out_type', params.out_type)
+  if (params.bill_no) query.set('bill_no', params.bill_no)
+  if (params.operator) query.set('operator', params.operator)
   if (params.start_time) query.set('start_time', params.start_time)
   if (params.end_time) query.set('end_time', params.end_time)
   return request<PaginatedData<StockOut>>(`/stock-out/?${query.toString()}`)
@@ -157,7 +176,7 @@ export async function getStockOutDetail(id: number): Promise<ApiResponse<StockOu
 }
 
 /**
- * 删除出库记录
+ * 删除/撤销出库记录
  */
 export async function deleteStockOut(id: number): Promise<ApiResponse<null>> {
   return request<null>(`/stock-out/${id}/delete/`, {
@@ -173,6 +192,7 @@ export default {
   createStockIn,
   getStockInList,
   getStockInDetail,
+  deleteStockIn,
   createStockOut,
   getStockOutList,
   getStockOutDetail,

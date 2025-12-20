@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { message, Spin, Modal } from 'antd'
+import { message, Spin, Modal, Tag } from 'antd'
 import {
   ThunderboltOutlined,
   StarOutlined,
@@ -12,14 +12,24 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons'
 import { getStockOutList, createStockOut, deleteStockOut, getStockList } from '../api/stock'
-import type { StockOut, Stock } from '../api/types'
+import type { StockOut, Stock, StockOutType } from '../api/types'
 import styles from './StockOut.module.css'
 
-const OUT_TYPE_OPTIONS = [
+// 出库类型选项
+const OUT_TYPE_OPTIONS: { value: StockOutType; label: string }[] = [
   { value: 'production', label: '生产领料' },
   { value: 'sales', label: '销售提货' },
   { value: 'other', label: '其他出库' },
+  { value: 'adjust_loss', label: '盘点盘亏' },
 ]
+
+// 出库类型颜色映射
+const OUT_TYPE_COLORS: Record<StockOutType, string> = {
+  production: 'blue',
+  sales: 'green',
+  other: 'default',
+  adjust_loss: 'red',
+}
 
 const StockOutPage = () => {
   const [loading, setLoading] = useState(false)
@@ -28,7 +38,7 @@ const StockOutPage = () => {
   const [page, setPage] = useState(1)
   const [pageSize] = useState(10)
   const [search, setSearch] = useState('')
-  const [outTypeFilter, setOutTypeFilter] = useState('')
+  const [outTypeFilter, setOutTypeFilter] = useState<StockOutType | ''>('')
 
   // 新建出库弹窗
   const [modalVisible, setModalVisible] = useState(false)
@@ -38,7 +48,7 @@ const StockOutPage = () => {
     material_code: '',
     out_quantity: '',
     out_value: '',
-    out_type: 'production' as 'production' | 'sales' | 'other',
+    out_type: 'production' as StockOutType,
     operator: '',
     remark: '',
   })
@@ -148,10 +158,11 @@ const StockOutPage = () => {
   // 删除出库记录
   const handleDelete = (record: StockOut) => {
     Modal.confirm({
-      title: '确认删除',
-      content: `确定要删除物料 "${record.material_name}" 的出库记录吗？删除后库存将恢复。`,
-      okText: '确认',
+      title: '确认撤销',
+      content: `确定要撤销单据号 "${record.bill_no}" 的出库记录吗？撤销后库存将恢复。`,
+      okText: '确认撤销',
       cancelText: '取消',
+      okButtonProps: { danger: true },
       onOk: async () => {
         try {
           const res = await deleteStockOut(record.id)
@@ -163,7 +174,7 @@ const StockOutPage = () => {
             message.error(res.message)
           }
         } catch {
-          message.error('删除失败')
+          message.error('撤销失败')
         }
       },
     })
@@ -228,7 +239,7 @@ const StockOutPage = () => {
               <select
                 className={`cyber-input ${styles.filterSelect}`}
                 value={outTypeFilter}
-                onChange={(e) => setOutTypeFilter(e.target.value)}
+                onChange={(e) => setOutTypeFilter(e.target.value as StockOutType | '')}
               >
                 <option value="">全部类型</option>
                 {OUT_TYPE_OPTIONS.map((opt) => (
@@ -255,11 +266,12 @@ const StockOutPage = () => {
                 <table className={styles.table}>
                   <thead>
                     <tr>
+                      <th>单据号</th>
                       <th>物料编号</th>
                       <th>物料名称</th>
+                      <th>出库类型</th>
                       <th>出库数量</th>
                       <th>出库价值</th>
-                      <th>出库类型</th>
                       <th>操作人</th>
                       <th>出库时间</th>
                       <th>操作</th>
@@ -268,28 +280,32 @@ const StockOutPage = () => {
                   <tbody>
                     {stockOutList.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className={styles.emptyCell}>
+                        <td colSpan={9} className={styles.emptyCell}>
                           暂无出库记录
                         </td>
                       </tr>
                     ) : (
                       stockOutList.map((item) => (
                         <tr key={item.id}>
+                          <td>
+                            <span style={{ fontFamily: 'monospace' }}>{item.bill_no}</span>
+                          </td>
                           <td>{item.material_code}</td>
                           <td>{item.material_name}</td>
+                          <td>
+                            <Tag color={OUT_TYPE_COLORS[item.out_type] || 'default'}>
+                              {item.out_type_display}
+                            </Tag>
+                          </td>
                           <td>{item.out_quantity}</td>
                           <td>¥{item.out_value}</td>
-                          <td>
-                            <span className={`${styles.tag} ${styles[`tag_${item.out_type}`]}`}>
-                              {item.out_type_display}
-                            </span>
-                          </td>
                           <td>{item.operator || '-'}</td>
                           <td>{new Date(item.out_time).toLocaleString()}</td>
                           <td>
                             <button
                               className={styles.deleteBtn}
                               onClick={() => handleDelete(item)}
+                              title="撤销出库"
                             >
                               <DeleteOutlined />
                             </button>
@@ -384,7 +400,7 @@ const StockOutPage = () => {
         `}</style>
         <div className={styles.modalForm}>
           <div className={styles.formGroup}>
-            <label>物料</label>
+            <label>物料 *</label>
             <select
               value={formData.material_code}
               onChange={(e) => handleMaterialChange(e.target.value)}
@@ -397,51 +413,55 @@ const StockOutPage = () => {
               ))}
             </select>
           </div>
-          <div className={styles.formGroup}>
-            <label>出库数量</label>
-            <input
-              type="number"
-              placeholder="请输入出库数量"
-              value={formData.out_quantity}
-              onChange={(e) => setFormData({ ...formData, out_quantity: e.target.value })}
-            />
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>出库类型 *</label>
+              <select
+                value={formData.out_type}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    out_type: e.target.value as StockOutType,
+                  })
+                }
+              >
+                {OUT_TYPE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label>出库数量 *</label>
+              <input
+                type="number"
+                placeholder="请输入出库数量"
+                value={formData.out_quantity}
+                onChange={(e) => setFormData({ ...formData, out_quantity: e.target.value })}
+              />
+            </div>
           </div>
-          <div className={styles.formGroup}>
-            <label>出库价值</label>
-            <input
-              type="number"
-              step="0.01"
-              placeholder="请输入出库价值"
-              value={formData.out_value}
-              onChange={(e) => setFormData({ ...formData, out_value: e.target.value })}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label>出库类型</label>
-            <select
-              value={formData.out_type}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  out_type: e.target.value as 'production' | 'sales' | 'other',
-                })
-              }
-            >
-              {OUT_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.formGroup}>
-            <label>操作人</label>
-            <input
-              type="text"
-              placeholder="请输入操作人（可选）"
-              value={formData.operator}
-              onChange={(e) => setFormData({ ...formData, operator: e.target.value })}
-            />
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>出库价值 *</label>
+              <input
+                type="number"
+                step="0.01"
+                placeholder="请输入出库价值"
+                value={formData.out_value}
+                onChange={(e) => setFormData({ ...formData, out_value: e.target.value })}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>操作人</label>
+              <input
+                type="text"
+                placeholder="请输入操作人（可选）"
+                value={formData.operator}
+                onChange={(e) => setFormData({ ...formData, operator: e.target.value })}
+              />
+            </div>
           </div>
           <div className={styles.formGroup}>
             <label>备注</label>

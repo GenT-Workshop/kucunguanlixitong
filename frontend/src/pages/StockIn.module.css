@@ -101,6 +101,14 @@
   padding: 0 var(--spacing-lg);
 }
 
+.addMaterialBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  height: 40px;
+  padding: 0 var(--spacing-md);
+}
+
 /* 表格样式 */
 .tableWrapper {
   overflow-x: auto;
@@ -185,6 +193,31 @@
   font-weight: 500;
 }
 
+/* 筛选下拉框 */
+.filterSelect {
+  width: 120px;
+  height: 40px;
+}
+
+/* 删除按钮 */
+.deleteBtn {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
 /* 弹窗样式 */
 .modal :global(.ant-modal-mask) {
   background: transparent !important;
@@ -235,6 +268,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+}
+
+.inputRow {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.inputRow .inputGroup {
+  flex: 1;
 }
 
 .inputGroup {
