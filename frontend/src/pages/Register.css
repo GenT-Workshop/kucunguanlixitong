@@ -1,0 +1,98 @@
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5F5F5;
+  padding: 24px;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  border-radius: 6px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.register-header h2 {
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* 覆盖 Ant Design 样式以匹配设计规范 */
+.register-card .ant-input,
+.register-card .ant-input-password {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  color: #262626;
+}
+
+.register-card .ant-input:focus,
+.register-card .ant-input-password:focus,
+.register-card .ant-input-focused {
+  border-color: #1890FF;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.register-card .ant-input::placeholder {
+  color: #BFBFBF;
+}
+
+.register-card .ant-btn-primary {
+  background-color: #1890FF;
+  border: none;
+  height: 40px;
+  font-size: 14px;
+}
+
+.register-card .ant-btn-primary:hover {
+  background-color: #40A9FF;
+}
+
+.register-card .ant-btn-primary:active {
+  background-color: #096DD9;
+}
+
+.register-card .ant-typography {
+  color: #8C8C8C;
+}
+
+.register-card a {
+  color: #1890FF;
+}
+
+.register-card a:hover {
+  color: #40A9FF;
+}
+
+.register-card .ant-form-item {
+  margin-bottom: 20px;
+}
+
+.register-card .ant-input-affix-wrapper {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+}
+
+.register-card .ant-input-affix-wrapper:focus,
+.register-card .ant-input-affix-wrapper-focused {
+  border-color: #1890FF;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.register-card .anticon {
+  color: #8C8C8C;
+}

@@ -1,0 +1,94 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5F5F5;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  border-radius: 6px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-header h2 {
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* 覆盖 Ant Design 样式以匹配设计规范 */
+.login-card .ant-input,
+.login-card .ant-input-password {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  color: #262626;
+}
+
+.login-card .ant-input:focus,
+.login-card .ant-input-password:focus,
+.login-card .ant-input-focused {
+  border-color: #1890FF;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.login-card .ant-input::placeholder {
+  color: #BFBFBF;
+}
+
+.login-card .ant-btn-primary {
+  background-color: #1890FF;
+  border: none;
+  height: 40px;
+  font-size: 14px;
+}
+
+.login-card .ant-btn-primary:hover {
+  background-color: #40A9FF;
+}
+
+.login-card .ant-btn-primary:active {
+  background-color: #096DD9;
+}
+
+.login-card .ant-typography {
+  color: #8C8C8C;
+}
+
+.login-card a {
+  color: #1890FF;
+}
+
+.login-card a:hover {
+  color: #40A9FF;
+}
+
+.login-card .ant-input-affix-wrapper {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+}
+
+.login-card .ant-input-affix-wrapper:focus,
+.login-card .ant-input-affix-wrapper-focused {
+  border-color: #1890FF;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.login-card .anticon {
+  color: #8C8C8C;
+}

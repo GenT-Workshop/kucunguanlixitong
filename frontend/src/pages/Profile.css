@@ -1,0 +1,255 @@
+.profile-container {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+  padding: 48px 24px;
+}
+
+.profile-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.profile-card {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  border-radius: 6px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.profile-avatar {
+  background-color: #1890FF;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h2 {
+  color: #262626;
+  margin-bottom: 12px;
+}
+
+.profile-actions {
+  flex-shrink: 0;
+}
+
+.profile-bio {
+  margin-bottom: 24px;
+}
+
+.profile-bio h4 {
+  color: #262626;
+  margin-bottom: 12px;
+}
+
+.profile-details h4 {
+  color: #262626;
+  margin-bottom: 16px;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.stat-card {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  border-radius: 6px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-content h2 {
+  color: #1890FF;
+  margin: 0;
+}
+
+/* 覆盖 Ant Design 样式以匹配设计规范 */
+.profile-card .ant-btn {
+  border-radius: 4px;
+  height: 36px;
+}
+
+.profile-card .ant-btn-primary {
+  background-color: #1890FF;
+  border: none;
+}
+
+.profile-card .ant-btn-primary:hover {
+  background-color: #40A9FF;
+}
+
+.profile-card .ant-btn-default {
+  background-color: transparent;
+  border: 1px solid #D9D9D9;
+  color: #8C8C8C;
+}
+
+.profile-card .ant-btn-default:hover {
+  border-color: #1890FF;
+  color: #1890FF;
+}
+
+.profile-card .ant-tag {
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.profile-card .ant-divider {
+  border-color: #F0F0F0;
+  margin: 24px 0;
+}
+
+.profile-card .ant-typography {
+  color: #8C8C8C;
+}
+
+.profile-card h2,
+.profile-card h4 {
+  color: #262626;
+}
+
+.profile-descriptions .ant-descriptions-item-label {
+  color: #8C8C8C;
+}
+
+.profile-descriptions .ant-descriptions-item-content {
+  color: #262626;
+}
+
+.profile-descriptions .anticon {
+  margin-right: 8px;
+  color: #1890FF;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-actions {
+    width: 100%;
+  }
+
+  .profile-actions .ant-space {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 编辑资料弹窗样式 */
+.edit-profile-modal .ant-modal-content {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+}
+
+.edit-profile-modal .ant-modal-header {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.edit-profile-modal .ant-modal-title {
+  color: #262626;
+}
+
+.edit-profile-modal .ant-modal-close {
+  color: #8C8C8C;
+}
+
+.edit-profile-modal .ant-modal-close:hover {
+  color: #262626;
+}
+
+.edit-profile-modal .ant-form-item-label > label {
+  color: #262626;
+}
+
+.edit-profile-modal .ant-input,
+.edit-profile-modal .ant-input-textarea {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  color: #262626;
+}
+
+.edit-profile-modal .ant-input:focus,
+.edit-profile-modal .ant-input-textarea:focus,
+.edit-profile-modal .ant-input-focused {
+  border-color: #1890FF;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.edit-profile-modal .ant-input::placeholder,
+.edit-profile-modal .ant-input-textarea::placeholder {
+  color: #BFBFBF;
+}
+
+.edit-profile-modal .ant-btn-primary {
+  background-color: #1890FF;
+  border: none;
+}
+
+.edit-profile-modal .ant-btn-primary:hover {
+  background-color: #40A9FF;
+}
+
+.edit-profile-modal .ant-btn-default {
+  background-color: transparent;
+  border: 1px solid #D9D9D9;
+  color: #8C8C8C;
+}
+
+.edit-profile-modal .ant-btn-default:hover {
+  border-color: #1890FF;
+  color: #1890FF;
+}
+
+.edit-profile-modal .ant-form-item-explain-error {
+  color: #F85149;
+}
+
+.edit-profile-modal .ant-input-textarea-show-count::after {
+  color: #8C8C8C;
+}
+
+.edit-profile-modal .ant-input-affix-wrapper {
+  background-color: #FFFFFF;
+  border: 1px solid #D9D9D9;
+}
+
+.edit-profile-modal .ant-input-affix-wrapper:focus,
+.edit-profile-modal .ant-input-affix-wrapper-focused {
+  border-color: #1890FF;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.edit-profile-modal .anticon {
+  color: #8C8C8C;
+}
+
