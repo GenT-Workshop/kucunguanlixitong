@@ -1,0 +1,344 @@
+.main {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 72px;
+  position: relative;
+  z-index: 1;
+}
+
+.leftSection {
+  flex: 0.8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-3xl);
+  padding-left: var(--spacing-3xl);
+}
+
+.rightSection {
+  flex: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+}
+
+.navTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-right: var(--spacing-md);
+}
+
+.profileCard {
+  width: 100%;
+  max-width: 520px;
+  padding: var(--spacing-xl);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.avatarWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #6B9FFF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+
+.editAvatarBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.editAvatarBtn:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.userName {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+}
+
+.userEmail {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.roleBadge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--accent-blue-glow);
+  color: var(--accent-blue);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+}
+
+.profileActions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+/* 统计数据 */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.statItem {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.statItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+}
+
+.statIcon {
+  font-size: 24px;
+  color: var(--accent-blue);
+  margin-bottom: var(--spacing-sm);
+}
+
+.statValue {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* 信息区块 */
+.infoSection {
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.infoLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.infoValue {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+/* 活动记录 */
+.activitySection {
+  padding: var(--spacing-lg) 0;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+}
+
+.activityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activityDot.create {
+  background: #52c41a;
+}
+
+.activityDot.update {
+  background: var(--accent-blue);
+}
+
+.activityDot.backup {
+  background: #faad14;
+}
+
+.activityDot.delete {
+  background: #ff4d4f;
+}
+
+.activityContent {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.activityAction {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.activityTime {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* 按钮组 */
+.buttonGroup {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.buttonGroup button {
+  flex: 1;
+}
+
+/* 音频波形动画 */
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 24px;
+}
+
+.waveBar {
+  width: 3px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 8px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 20px;
+    opacity: 1;
+  }
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .leftSection {
+    padding: var(--spacing-xl);
+    text-align: center;
+    align-items: center;
+  }
+
+  .leftSection :global(.hero-title) {
+    font-size: var(--font-size-3xl);
+  }
+
+  .leftSection :global(.hero-year) {
+    font-size: var(--font-size-4xl);
+  }
+
+  .profileCard {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profileHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profileActions {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+}

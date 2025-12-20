@@ -8,6 +8,10 @@ DEBUG = True
 
 ALLOWED_HOSTS: list[str] = ["*"]
 
+# CORS 配置
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -15,10 +19,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "accounts",
+    "corsheaders",
+    "rest_framework",
+    "apps.accounts",
+    "apps.stock",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -28,7 +36,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "kucun.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
@@ -46,7 +54,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "kucun.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
@@ -61,6 +69,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+# REST Framework 配置
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+}
 
 LANGUAGE_CODE = "zh-hans"
 
