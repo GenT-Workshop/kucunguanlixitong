@@ -5,7 +5,9 @@
       "Bash(source:*)",
       "Bash(.venv/bin/python:*)",
       "Bash(git reset:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git merge:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
