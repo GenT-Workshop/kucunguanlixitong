@@ -7,7 +7,10 @@
       "Bash(git reset:*)",
       "Bash(git add:*)",
       "Bash(git merge:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\" \"D:/git workplace/backend/manage.py\" makemigrations)",
+      "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\" \"D:/git workplace/backend/manage.py\" showmigrations stock)",
+      "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\":*)"
     ]
   }
 }
