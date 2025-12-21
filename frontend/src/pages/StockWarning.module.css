@@ -1,0 +1,464 @@
+.main {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 72px;
+  position: relative;
+  z-index: 1;
+}
+
+.leftSection {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-3xl);
+  padding-left: var(--spacing-3xl);
+}
+
+.rightSection {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  padding-top: var(--spacing-2xl);
+}
+
+.navTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-right: var(--spacing-md);
+}
+
+.contentCard {
+  width: 100%;
+  max-width: 1100px;
+  padding: var(--spacing-xl);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.titleIcon {
+  color: #FA8C16;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.searchWrapper {
+  position: relative;
+  width: 200px;
+}
+
+.searchWrapper input {
+  padding-right: 40px;
+}
+
+.searchBtn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.searchBtn:hover {
+  color: var(--accent-blue);
+}
+
+/* 筛选下拉框 */
+.filterSelect {
+  width: 120px;
+  height: 40px;
+}
+
+/* 检查预警按钮 */
+.checkBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  height: 40px;
+  padding: 0 var(--spacing-lg);
+  background: #FA8C16 !important;
+}
+
+.checkBtn:hover {
+  background: #d97706 !important;
+}
+
+/* 统计卡片 */
+.statsCard {
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+.statItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.statItem:last-child {
+  border-bottom: none;
+}
+
+.statLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.statValue {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.statValue.pending {
+  color: #1890FF;
+}
+
+.statValue.low {
+  color: #ef4444;
+}
+
+.statValue.high {
+  color: #FA8C16;
+}
+
+/* 表格样式 */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table :global(.ant-table) {
+  background: transparent !important;
+}
+
+.table :global(.ant-table-thead > tr > th) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  font-weight: 500;
+}
+
+.table :global(.ant-table-tbody > tr > td) {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+}
+
+.table :global(.ant-table-tbody > tr:hover > td) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.table :global(.ant-table-placeholder) {
+  background: transparent !important;
+}
+
+.table :global(.ant-empty-description) {
+  color: var(--text-muted) !important;
+}
+
+.table :global(.ant-pagination) {
+  margin-top: var(--spacing-lg) !important;
+}
+
+.table :global(.ant-pagination-item) {
+  background: transparent !important;
+  border-color: var(--border-color) !important;
+}
+
+.table :global(.ant-pagination-item a) {
+  color: var(--text-secondary) !important;
+}
+
+.table :global(.ant-pagination-item-active) {
+  border-color: var(--accent-blue) !important;
+}
+
+.table :global(.ant-pagination-item-active a) {
+  color: var(--accent-blue) !important;
+}
+
+.table :global(.ant-pagination-prev button),
+.table :global(.ant-pagination-next button) {
+  color: var(--text-secondary) !important;
+}
+
+.table :global(.ant-pagination-disabled button) {
+  color: var(--text-disabled) !important;
+}
+
+.table :global(.ant-select-selector) {
+  background: transparent !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+.table :global(.ant-pagination-total-text) {
+  color: var(--text-muted) !important;
+}
+
+.quantityCell {
+  color: #FA8C16;
+  font-weight: 600;
+}
+
+/* 操作按钮 */
+.actionBtns {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.handleBtn {
+  background: transparent;
+  border: 1px solid rgba(82, 196, 26, 0.5);
+  color: #52C41A;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.handleBtn:hover {
+  background: rgba(82, 196, 26, 0.1);
+  border-color: #52C41A;
+}
+
+.ignoreBtn {
+  background: transparent;
+  border: 1px solid rgba(140, 140, 140, 0.5);
+  color: #8C8C8C;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ignoreBtn:hover {
+  background: rgba(140, 140, 140, 0.1);
+  border-color: #8C8C8C;
+}
+
+.handledText {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* 弹窗样式 */
+.modal :global(.ant-modal-mask) {
+  background: transparent !important;
+}
+
+.modal :global(.ant-modal-content) {
+  background: #000000 !important;
+  border: 1px solid #333;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  padding: 0 !important;
+}
+
+.modal :global(.ant-modal-body) {
+  padding: 24px !important;
+}
+
+.modal :global(.ant-modal-close) {
+  color: #ffffff !important;
+}
+
+.modal :global(.ant-modal-close:hover) {
+  color: #cccccc !important;
+}
+
+.modalContent {
+  padding: var(--spacing-md);
+  background: #000000;
+  color: #ffffff;
+}
+
+.modalTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+  color: #ffffff;
+}
+
+.modalSubtitle {
+  color: #cccccc;
+  font-size: var(--font-size-sm);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.inputGroup input,
+.inputGroup textarea {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #444 !important;
+}
+
+.inputGroup input::placeholder,
+.inputGroup textarea::placeholder {
+  color: #888 !important;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.modalActions button {
+  min-width: 100px;
+  height: 44px;
+}
+
+.ignoreSubmitBtn {
+  background: #8C8C8C !important;
+}
+
+.ignoreSubmitBtn:hover {
+  background: #6b6b6b !important;
+}
+
+/* 音频波形动画 */
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 24px;
+}
+
+.waveBar {
+  width: 3px;
+  background: #FA8C16;
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 8px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 20px;
+    opacity: 1;
+  }
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .leftSection {
+    flex: none;
+    padding: var(--spacing-xl);
+    text-align: center;
+    align-items: center;
+  }
+
+  .leftSection .hero-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .leftSection .hero-year {
+    font-size: var(--font-size-4xl);
+  }
+
+  .statsCard {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .rightSection {
+    padding: var(--spacing-md);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .searchWrapper {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .contentCard {
+    padding: var(--spacing-md);
+  }
+
+  .filterSelect {
+    width: 100%;
+  }
+
+  .checkBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -6,6 +6,12 @@ from .views import (
     logout_view,
     profile_view,
     change_password_view,
+    user_list_view,
+    user_detail_view,
+    user_create_view,
+    user_update_view,
+    user_delete_view,
+    user_reset_password_view,
 )
 
 urlpatterns = [
@@ -14,4 +20,11 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("profile/", profile_view, name="profile"),
     path("change-password/", change_password_view, name="change_password"),
+    # 用户管理（管理员）
+    path("users/", user_list_view, name="user_list"),
+    path("users/create/", user_create_view, name="user_create"),
+    path("users/<int:pk>/", user_detail_view, name="user_detail"),
+    path("users/<int:pk>/update/", user_update_view, name="user_update"),
+    path("users/<int:pk>/delete/", user_delete_view, name="user_delete"),
+    path("users/<int:pk>/reset-password/", user_reset_password_view, name="user_reset_password"),
 ]

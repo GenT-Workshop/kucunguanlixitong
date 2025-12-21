@@ -1,0 +1,387 @@
+.main {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 72px;
+  position: relative;
+  z-index: 1;
+}
+
+.leftSection {
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-3xl);
+  padding-left: var(--spacing-3xl);
+}
+
+.rightSection {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  padding-top: var(--spacing-2xl);
+  overflow-y: auto;
+  max-height: calc(100vh - 72px);
+}
+
+.navTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-right: var(--spacing-md);
+}
+
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 400px;
+}
+
+.statsContainer {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* 概览区域 */
+.overviewSection {
+  width: 100%;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.titleIcon {
+  color: #EB2F96;
+}
+
+.sectionSubtitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 概览卡片 */
+.overviewCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.overviewCard {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.cardIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardContent {
+  flex: 1;
+}
+
+.cardValue {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cardLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+}
+
+.cardExtra {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.stockLow {
+  color: #ef4444;
+}
+
+.stockNormal {
+  color: #52C41A;
+}
+
+.stockHigh {
+  color: #FA8C16;
+}
+
+.valueText {
+  color: #4ade80;
+}
+
+/* 趋势图区域 */
+.trendSection {
+  padding: var(--spacing-xl);
+}
+
+.trendTabs {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.trendTab {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+}
+
+.trendTab:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.trendTab.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+
+.trendChart {
+  margin-top: var(--spacing-lg);
+}
+
+.chartLegend {
+  display: flex;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.legendIn {
+  color: #4F8CFF;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.legendOut {
+  color: #52C41A;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.chartBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 160px;
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.barGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.bars {
+  display: flex;
+  gap: 2px;
+  height: 140px;
+  align-items: flex-end;
+}
+
+.barIn {
+  width: 8px;
+  background: linear-gradient(180deg, #4F8CFF 0%, rgba(79, 140, 255, 0.3) 100%);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: height 0.3s ease;
+}
+
+.barOut {
+  width: 8px;
+  background: linear-gradient(180deg, #52C41A 0%, rgba(82, 196, 26, 0.3) 100%);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: height 0.3s ease;
+}
+
+.barLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+  white-space: nowrap;
+}
+
+/* 下方两列 */
+.bottomSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+}
+
+.rankingSection,
+.categorySection {
+  padding: var(--spacing-lg);
+}
+
+/* 表格样式 */
+.table :global(.ant-table) {
+  background: transparent !important;
+}
+
+.table :global(.ant-table-thead > tr > th) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  font-weight: 500;
+  font-size: var(--font-size-xs);
+  padding: 8px !important;
+}
+
+.table :global(.ant-table-tbody > tr > td) {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  font-size: var(--font-size-sm);
+  padding: 8px !important;
+}
+
+.table :global(.ant-table-tbody > tr:hover > td) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.table :global(.ant-table-placeholder) {
+  background: transparent !important;
+}
+
+.table :global(.ant-empty-description) {
+  color: var(--text-muted) !important;
+}
+
+.topRank {
+  color: #EB2F96;
+  font-weight: 700;
+}
+
+.qtyValue {
+  color: #EB2F96;
+  font-weight: 600;
+}
+
+/* 音频波形动画 */
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 24px;
+}
+
+.waveBar {
+  width: 3px;
+  background: #EB2F96;
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 8px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 20px;
+    opacity: 1;
+  }
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .overviewCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bottomSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .leftSection {
+    flex: none;
+    padding: var(--spacing-xl);
+    text-align: center;
+    align-items: center;
+  }
+
+  .leftSection .hero-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .leftSection .hero-year {
+    font-size: var(--font-size-4xl);
+  }
+
+  .rightSection {
+    padding: var(--spacing-md);
+    max-height: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .overviewCards {
+    grid-template-columns: 1fr;
+  }
+
+  .chartBars {
+    overflow-x: auto;
+  }
+
+  .barGroup {
+    min-width: 24px;
+  }
+
+  .trendTabs {
+    flex-wrap: wrap;
+  }
+}

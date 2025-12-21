@@ -203,7 +203,7 @@ const StockOutPage = () => {
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
-          <Link to="/login" className="nav-link">Home</Link>
+          <Link to="/dashboard" className="nav-link">Home</Link>
           <Link to="/profile" className="nav-link">Profile</Link>
         </div>
       </header>

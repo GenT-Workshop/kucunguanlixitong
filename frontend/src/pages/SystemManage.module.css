@@ -1,0 +1,397 @@
+.main {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 72px;
+  position: relative;
+  z-index: 1;
+}
+
+.leftSection {
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-3xl);
+  padding-left: var(--spacing-3xl);
+}
+
+.rightSection {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  padding-top: var(--spacing-2xl);
+  overflow-y: auto;
+  max-height: calc(100vh - 72px);
+}
+
+.navTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-right: var(--spacing-md);
+}
+
+.contentCard {
+  width: 100%;
+  max-width: 1100px;
+  padding: var(--spacing-xl);
+}
+
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Tabs 样式 */
+.tabs :global(.ant-tabs-nav) {
+  margin-bottom: var(--spacing-lg);
+}
+
+.tabs :global(.ant-tabs-tab) {
+  color: var(--text-secondary) !important;
+  font-size: var(--font-size-base);
+}
+
+.tabs :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+  color: #13C2C2 !important;
+}
+
+.tabs :global(.ant-tabs-ink-bar) {
+  background: #13C2C2 !important;
+}
+
+.tabLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.tabContent {
+  padding: var(--spacing-md) 0;
+}
+
+/* 头部 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.titleIcon {
+  color: #13C2C2;
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+/* 表格样式 */
+.tableWrapper {
+  margin-top: var(--spacing-md);
+}
+
+.table :global(.ant-table) {
+  background: transparent !important;
+}
+
+.table :global(.ant-table-thead > tr > th) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  font-weight: 500;
+  font-size: var(--font-size-xs);
+  padding: 12px 8px !important;
+}
+
+.table :global(.ant-table-tbody > tr > td) {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  font-size: var(--font-size-sm);
+  padding: 12px 8px !important;
+}
+
+.table :global(.ant-table-tbody > tr:hover > td) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.table :global(.ant-table-placeholder) {
+  background: transparent !important;
+}
+
+.table :global(.ant-empty-description) {
+  color: var(--text-muted) !important;
+}
+
+.table :global(.ant-pagination) {
+  margin-top: var(--spacing-lg);
+}
+
+.table :global(.ant-pagination-item) {
+  background: transparent !important;
+  border-color: var(--border-color) !important;
+}
+
+.table :global(.ant-pagination-item a) {
+  color: var(--text-secondary) !important;
+}
+
+.table :global(.ant-pagination-item-active) {
+  border-color: #13C2C2 !important;
+}
+
+.table :global(.ant-pagination-item-active a) {
+  color: #13C2C2 !important;
+}
+
+.username {
+  font-weight: 600;
+  color: #13C2C2;
+}
+
+.adminBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(19, 194, 194, 0.15);
+  color: #13C2C2;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.userBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+.activeStatus {
+  color: #52C41A;
+  font-weight: 500;
+}
+
+.inactiveStatus {
+  color: #FF4D4F;
+  font-weight: 500;
+}
+
+/* 操作按钮 */
+.actionBtns {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.actionBtn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.actionBtn:hover {
+  border-color: #13C2C2;
+  color: #13C2C2;
+}
+
+.actionBtn.dangerBtn:hover {
+  border-color: #FF4D4F;
+  color: #FF4D4F;
+}
+
+/* 设置区域 */
+.settingsSection {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.sectionIcon {
+  color: #13C2C2;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.settingItem:last-child {
+  border-bottom: none;
+}
+
+.settingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.settingLabel {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.settingDesc {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* 弹窗样式 */
+.modal :global(.ant-modal-content) {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+}
+
+.modal :global(.ant-modal-body) {
+  padding: 0 !important;
+}
+
+.modalContent {
+  padding: var(--spacing-xl);
+}
+
+.modalTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.modalDesc {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.formLabel {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+}
+
+/* 音频波形动画 */
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 24px;
+}
+
+.waveBar {
+  width: 3px;
+  background: #13C2C2;
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 8px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 20px;
+    opacity: 1;
+  }
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .leftSection {
+    flex: none;
+    padding: var(--spacing-xl);
+    text-align: center;
+    align-items: center;
+  }
+
+  .leftSection .hero-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .leftSection .hero-year {
+    font-size: var(--font-size-4xl);
+  }
+
+  .rightSection {
+    padding: var(--spacing-md);
+    max-height: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .contentCard {
+    padding: var(--spacing-md);
+  }
+
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
+
+  .settingItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+}

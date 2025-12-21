@@ -121,3 +121,122 @@ class StockOut(models.Model):
 
     def __str__(self):
         return f"{self.material_code} - {self.out_quantity}"
+
+
+class StockWarning(models.Model):
+    """库存预警表"""
+    WARNING_TYPE_CHOICES = [
+        ('low', '库存不足'),
+        ('high', '库存过高'),
+    ]
+
+    LEVEL_CHOICES = [
+        ('warning', '警告'),
+        ('danger', '危险'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', '待处理'),
+        ('handled', '已处理'),
+        ('ignored', '已忽略'),
+    ]
+
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, verbose_name='关联库存')
+    material_code = models.CharField(max_length=50, verbose_name='物料编号')
+    material_name = models.CharField(max_length=100, verbose_name='物料名称')
+    warning_type = models.CharField(max_length=10, choices=WARNING_TYPE_CHOICES, verbose_name='预警类型')
+    level = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='warning', verbose_name='预警级别')
+    current_stock = models.IntegerField(verbose_name='当前库存')
+    min_stock = models.IntegerField(default=0, verbose_name='最小库存')
+    max_stock = models.IntegerField(default=0, verbose_name='最大库存')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending', verbose_name='处理状态')
+    handled_by = models.CharField(max_length=50, blank=True, default='', verbose_name='处理人')
+    handled_at = models.DateTimeField(null=True, blank=True, verbose_name='处理时间')
+    remark = models.TextField(blank=True, default='', verbose_name='备注')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+    class Meta:
+        db_table = 'stock_warning'
+        verbose_name = '库存预警'
+        verbose_name_plural = verbose_name
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.material_code} - {self.get_warning_type_display()}"
+
+    @property
+    def warning_type_display(self):
+        return dict(self.WARNING_TYPE_CHOICES).get(self.warning_type, '')
+
+    @property
+    def level_display(self):
+        return dict(self.LEVEL_CHOICES).get(self.level, '')
+
+    @property
+    def status_display(self):
+        return dict(self.STATUS_CHOICES).get(self.status, '')
+
+
+class StockCountTask(models.Model):
+    """盘点任务表"""
+    STATUS_CHOICES = [
+        ('pending', '待盘点'),
+        ('doing', '盘点中'),
+        ('done', '已完成'),
+        ('cancelled', '已取消'),
+    ]
+
+    task_no = models.CharField(max_length=30, unique=True, verbose_name='任务号')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending', verbose_name='状态')
+    created_by = models.CharField(max_length=50, verbose_name='创建人')
+    remark = models.TextField(blank=True, default='', verbose_name='备注')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    completed_at = models.DateTimeField(null=True, blank=True, verbose_name='完成时间')
+
+    class Meta:
+        db_table = 'stock_count_task'
+        verbose_name = '盘点任务'
+        verbose_name_plural = verbose_name
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.task_no}"
+
+    @property
+    def status_display(self):
+        return dict(self.STATUS_CHOICES).get(self.status, '')
+
+
+class StockCountItem(models.Model):
+    """盘点明细表"""
+    DIFF_TYPE_CHOICES = [
+        ('gain', '盘盈'),
+        ('loss', '盘亏'),
+        ('none', '无差异'),
+    ]
+
+    task = models.ForeignKey(StockCountTask, on_delete=models.CASCADE, related_name='items', verbose_name='盘点任务')
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, verbose_name='关联库存')
+    material_code = models.CharField(max_length=50, verbose_name='物料编号')
+    material_name = models.CharField(max_length=100, verbose_name='物料名称')
+    book_qty = models.IntegerField(verbose_name='账面数量')
+    real_qty = models.IntegerField(null=True, blank=True, verbose_name='实盘数量')
+    diff_qty = models.IntegerField(default=0, verbose_name='差异数量')
+    diff_type = models.CharField(max_length=10, choices=DIFF_TYPE_CHOICES, default='none', verbose_name='差异类型')
+    remark = models.TextField(blank=True, default='', verbose_name='备注')
+    operator = models.CharField(max_length=50, blank=True, default='', verbose_name='操作人')
+    operated_at = models.DateTimeField(null=True, blank=True, verbose_name='操作时间')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+    class Meta:
+        db_table = 'stock_count_item'
+        verbose_name = '盘点明细'
+        verbose_name_plural = verbose_name
+        ordering = ['id']
+
+    def __str__(self):
+        return f"{self.task.task_no} - {self.material_code}"
+
+    @property
+    def diff_type_display(self):
+        return dict(self.DIFF_TYPE_CHOICES).get(self.diff_type, '')

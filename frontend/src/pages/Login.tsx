@@ -21,9 +21,9 @@ const Login = () => {
   const navigate = useNavigate()
   const { login, isLoggedIn } = useUser()
 
-  // 如果已登录，跳转到个人主页
+  // 如果已登录，跳转到主页
   if (isLoggedIn) {
-    navigate('/profile')
+    navigate('/dashboard')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +53,7 @@ const Login = () => {
         } else {
           localStorage.removeItem('remembered_username')
         }
-        navigate('/profile')
+        navigate('/dashboard')
       } else {
         message.error(result.message)
       }
