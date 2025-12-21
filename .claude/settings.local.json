@@ -11,7 +11,8 @@
       "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\" \"D:/git workplace/backend/manage.py\" makemigrations)",
       "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\" \"D:/git workplace/backend/manage.py\" showmigrations stock)",
       "Bash(\"D:/git workplace/backend/kucunguanli/kucunguanlixitong/.venv/bin/python\":*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
