@@ -71,7 +71,6 @@ export interface StockInitParams {
   supplier?: string
   max_stock?: number
   min_stock?: number
-  unit_price?: number
   stock_value?: number
 }
 

@@ -489,19 +489,47 @@ const StockCount = () => {
 
       {/* 创建任务弹窗 */}
       <Modal
-        title={null}
+        title="新建盘点任务"
         open={createModalVisible}
         onCancel={() => setCreateModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="stock-count-modal"
         width={480}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>新建盘点任务</h3>
-          <p className={styles.modalSubtitle}>创建后将自动添加所有启用物料</p>
-
-          <div className={styles.form}>
+        <style>{`
+          .stock-count-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(19, 194, 194, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(19, 194, 194, 0.3) !important;
+            padding: 0 !important;
+          }
+          .stock-count-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(19, 194, 194, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .stock-count-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .stock-count-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .stock-count-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .stock-count-modal .ant-modal-close:hover {
+            color: #13C2C2 !important;
+            background: rgba(19, 194, 194, 0.2) !important;
+          }
+        `}</style>
+        <p className={styles.modalSubtitle}>创建后将自动添加所有启用物料</p>
+        <div className={styles.form}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>创建人 *</label>
               <input
@@ -544,22 +572,50 @@ const StockCount = () => {
               </button>
             </div>
           </div>
-        </div>
       </Modal>
 
       {/* 任务详情弹窗 */}
       <Modal
-        title={null}
+        title="盘点任务详情"
         open={detailModalVisible}
         onCancel={() => setDetailModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="stock-count-detail-modal"
         width={900}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>盘点任务详情</h3>
-          {detailLoading ? (
+        <style>{`
+          .stock-count-detail-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(19, 194, 194, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(19, 194, 194, 0.3) !important;
+            padding: 0 !important;
+          }
+          .stock-count-detail-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(19, 194, 194, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .stock-count-detail-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .stock-count-detail-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .stock-count-detail-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .stock-count-detail-modal .ant-modal-close:hover {
+            color: #13C2C2 !important;
+            background: rgba(19, 194, 194, 0.2) !important;
+          }
+        `}</style>
+        {detailLoading ? (
             <div className={styles.loadingWrapper}>
               <Spin indicator={<LoadingOutlined style={{ fontSize: 32 }} />} />
             </div>
@@ -620,30 +676,57 @@ const StockCount = () => {
           ) : (
             <p className={styles.modalSubtitle}>暂无数据</p>
           )}
-        </div>
       </Modal>
 
       {/* 盘点录入弹窗 */}
       <Modal
-        title={null}
+        title="盘点录入"
         open={countModalVisible}
         onCancel={() => setCountModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="stock-count-input-modal"
         width={420}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>盘点录入</h3>
-          {currentItem && (
-            <p className={styles.modalSubtitle}>
-              {currentItem.material_code} - {currentItem.material_name}
-              <br />
-              账面数量: {currentItem.book_qty}
-            </p>
-          )}
-
-          <div className={styles.form}>
+        <style>{`
+          .stock-count-input-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(19, 194, 194, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(19, 194, 194, 0.3) !important;
+            padding: 0 !important;
+          }
+          .stock-count-input-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(19, 194, 194, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .stock-count-input-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .stock-count-input-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .stock-count-input-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .stock-count-input-modal .ant-modal-close:hover {
+            color: #13C2C2 !important;
+            background: rgba(19, 194, 194, 0.2) !important;
+          }
+        `}</style>
+        {currentItem && (
+          <p className={styles.modalSubtitle}>
+            {currentItem.material_code} - {currentItem.material_name}
+            <br />
+            账面数量: {currentItem.book_qty}
+          </p>
+        )}
+        <div className={styles.form}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>实盘数量 *</label>
               <input
@@ -698,7 +781,6 @@ const StockCount = () => {
               </button>
             </div>
           </div>
-        </div>
       </Modal>
 
       {/* 角落信息 */}

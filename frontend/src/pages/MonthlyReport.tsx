@@ -246,20 +246,46 @@ const MonthlyReport = () => {
 
       {/* 详情弹窗 */}
       <Modal
-        title={null}
+        title={`${currentDetail?.month || ''} 月度结存明细`}
         open={detailModalVisible}
         onCancel={() => setDetailModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="monthly-report-modal"
         width={1000}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>
-            {currentDetail?.month} 月度结存明细
-          </h3>
-
-          {detailLoading ? (
+        <style>{`
+          .monthly-report-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(82, 196, 26, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(82, 196, 26, 0.3) !important;
+            padding: 0 !important;
+          }
+          .monthly-report-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(82, 196, 26, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .monthly-report-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .monthly-report-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .monthly-report-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .monthly-report-modal .ant-modal-close:hover {
+            color: #52C41A !important;
+            background: rgba(82, 196, 26, 0.2) !important;
+          }
+        `}</style>
+        {detailLoading ? (
             <div className={styles.loadingWrapper}>
               <Spin size="large" />
             </div>
@@ -322,7 +348,6 @@ const MonthlyReport = () => {
               关闭
             </button>
           </div>
-        </div>
       </Modal>
 
       {/* 角落信息 */}

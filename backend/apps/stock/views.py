@@ -90,6 +90,10 @@ def stock_init_view(request):
 
     material_code = (payload.get("material_code") or "").strip()
     material_name = (payload.get("material_name") or "").strip()
+    spec = (payload.get("spec") or "").strip()
+    unit = (payload.get("unit") or "").strip()
+    category = (payload.get("category") or "").strip()
+    supplier = (payload.get("supplier") or "").strip()
     max_stock = payload.get("max_stock", 0)
     min_stock = payload.get("min_stock", 0)
     stock_value = payload.get("stock_value", 0)
@@ -107,6 +111,10 @@ def stock_init_view(request):
     stock = Stock.objects.create(
         material_code=material_code,
         material_name=material_name,
+        spec=spec,
+        unit=unit,
+        category=category,
+        supplier=supplier,
         max_stock=max_stock,
         min_stock=min_stock,
         stock_value=Decimal(str(stock_value)),

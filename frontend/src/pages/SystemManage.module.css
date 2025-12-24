@@ -277,6 +277,40 @@
   color: var(--text-muted);
 }
 
+/* Ant Design Select 下拉框样式 */
+.settingItem :global(.ant-select) {
+  min-width: 120px !important;
+}
+
+.settingItem :global(.ant-select-selector) {
+  height: 40px !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-primary) !important;
+  padding: 0 12px !important;
+  font-size: 14px;
+  transition: all var(--transition-base) !important;
+}
+
+.settingItem :global(.ant-select-selector:hover) {
+  border-color: var(--accent-blue) !important;
+}
+
+.settingItem :global(.ant-select-focused .ant-select-selector) {
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 3px var(--accent-blue-glow) !important;
+}
+
+.settingItem :global(.ant-select-selection-item) {
+  line-height: 36px !important;
+  color: var(--text-primary) !important;
+}
+
+.settingItem :global(.ant-select-arrow) {
+  color: var(--text-primary) !important;
+}
+
 /* 弹窗样式 */
 .modal :global(.ant-modal-content) {
   background: var(--glass-bg) !important;

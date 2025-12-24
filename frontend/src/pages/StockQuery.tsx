@@ -329,20 +329,50 @@ const StockQuery = () => {
 
       {/* 详情弹窗 */}
       <Modal
-        title={null}
+        title="库存详情"
         open={detailModalVisible}
         onCancel={() => setDetailModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="stock-query-modal"
         width={600}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>库存详情</h3>
-          {detailLoading ? (
-            <p className={styles.modalSubtitle}>加载中...</p>
-          ) : currentStock ? (
-            <div className={styles.detailGrid}>
+        <style>{`
+          .stock-query-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(114, 46, 209, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(114, 46, 209, 0.3) !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+          }
+          .stock-query-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(114, 46, 209, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .stock-query-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .stock-query-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .stock-query-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .stock-query-modal .ant-modal-close:hover {
+            color: #722ED1 !important;
+            background: rgba(114, 46, 209, 0.2) !important;
+          }
+        `}</style>
+        {detailLoading ? (
+          <p className={styles.modalSubtitle}>加载中...</p>
+        ) : currentStock ? (
+          <div className={styles.detailGrid}>
               <div className={styles.detailItem}>
                 <span className={styles.detailLabel}>物料编号</span>
                 <span className={styles.detailValue}>{currentStock.material_code}</span>
@@ -427,7 +457,6 @@ const StockQuery = () => {
               关闭
             </button>
           </div>
-        </div>
       </Modal>
 
       {/* 角落信息 */}

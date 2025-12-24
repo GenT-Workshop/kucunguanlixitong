@@ -84,6 +84,11 @@ const StockWarningPage = () => {
   // 检查预警loading
   const [checkLoading, setCheckLoading] = useState(false)
 
+  // 判断库存是否在合理范围内
+  const isStockNormal = (record: StockWarningType) => {
+    return record.current_stock >= record.min_stock && record.current_stock <= record.max_stock
+  }
+
   // 加载预警列表
   const loadWarningList = async () => {
     setLoading(true)
@@ -97,8 +102,12 @@ const StockWarningPage = () => {
         status: statusFilter || undefined,
       })
       if (res.code === 200 && res.data) {
-        setWarningList(res.data.list)
-        setTotal(res.data.total)
+        // 过滤掉库存已恢复正常的记录，只显示异常的预警
+        const abnormalList = res.data.list.filter((item: StockWarningType) => {
+          return item.current_stock < item.min_stock || item.current_stock > item.max_stock
+        })
+        setWarningList(abnormalList)
+        setTotal(abnormalList.length)
       } else {
         message.error(res.message || '获取预警列表失败')
       }
@@ -241,11 +250,17 @@ const StockWarningPage = () => {
       dataIndex: 'status',
       key: 'status',
       width: 90,
-      render: (val: WarningStatus, record: StockWarningType) => (
-        <Tag color={STATUS_COLORS[val] || 'default'}>
-          {record.status_display || val}
-        </Tag>
-      ),
+      render: (_val: WarningStatus, record: StockWarningType) => {
+        // 如果库存已恢复正常，动态显示为已处理
+        if (isStockNormal(record)) {
+          return <Tag color="green">已处理</Tag>
+        }
+        return (
+          <Tag color={STATUS_COLORS[record.status] || 'default'}>
+            {record.status_display || record.status}
+          </Tag>
+        )
+      },
     },
     {
       title: '处理人',
@@ -255,40 +270,41 @@ const StockWarningPage = () => {
       render: (val: string) => val || '-',
     },
     {
-      title: '创建时间',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      width: 160,
-      render: (val: string) => new Date(val).toLocaleString('zh-CN'),
-    },
-    {
       title: '操作',
       key: 'action',
       width: 140,
-      render: (_: unknown, record: StockWarningType) => (
-        record.status === 'pending' ? (
-          <div className={styles.actionBtns}>
-            <button
-              className={styles.handleBtn}
-              onClick={() => openHandleModal(record, 'handle')}
-              title="处理"
-            >
-              <CheckOutlined />
-            </button>
-            <button
-              className={styles.ignoreBtn}
-              onClick={() => openHandleModal(record, 'ignore')}
-              title="忽略"
-            >
-              <CloseOutlined />
-            </button>
-          </div>
-        ) : (
+      render: (_: unknown, record: StockWarningType) => {
+        // 如果库存已恢复正常，显示已处理
+        if (isStockNormal(record)) {
+          return <span className={styles.handledText}>已处理</span>
+        }
+        // 待处理状态显示操作按钮
+        if (record.status === 'pending') {
+          return (
+            <div className={styles.actionBtns}>
+              <button
+                className={styles.handleBtn}
+                onClick={() => openHandleModal(record, 'handle')}
+                title="处理"
+              >
+                <CheckOutlined />
+              </button>
+              <button
+                className={styles.ignoreBtn}
+                onClick={() => openHandleModal(record, 'ignore')}
+                title="忽略"
+              >
+                <CloseOutlined />
+              </button>
+            </div>
+          )
+        }
+        return (
           <span className={styles.handledText}>
             {record.status === 'handled' ? '已处理' : '已忽略'}
           </span>
         )
-      ),
+      },
     },
   ]
 
@@ -391,9 +407,6 @@ const StockWarningPage = () => {
                     </option>
                   ))}
                 </select>
-                <button className="icon-button" onClick={loadWarningList}>
-                  <ReloadOutlined style={{ fontSize: 18 }} />
-                </button>
                 <button
                   className={`cyber-button ${styles.checkBtn}`}
                   onClick={handleCheckWarnings}
@@ -434,23 +447,50 @@ const StockWarningPage = () => {
 
       {/* 处理弹窗 */}
       <Modal
-        title={null}
+        title={handleForm.action === 'handle' ? '处理预警' : '忽略预警'}
         open={handleModalVisible}
         onCancel={() => setHandleModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="stock-warning-modal"
         width={480}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>
-            {handleForm.action === 'handle' ? '处理预警' : '忽略预警'}
-          </h3>
-          <p className={styles.modalSubtitle}>
-            {currentWarning?.material_code} - {currentWarning?.material_name}
-          </p>
-
-          <div className={styles.form}>
+        <style>{`
+          .stock-warning-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(250, 140, 22, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(250, 140, 22, 0.3) !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+          }
+          .stock-warning-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(250, 140, 22, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .stock-warning-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .stock-warning-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .stock-warning-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .stock-warning-modal .ant-modal-close:hover {
+            color: #FA8C16 !important;
+            background: rgba(250, 140, 22, 0.2) !important;
+          }
+        `}</style>
+        <p className={styles.modalSubtitle}>
+          {currentWarning?.material_code} - {currentWarning?.material_name}
+        </p>
+        <div className={styles.form}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>处理人</label>
               <input
@@ -497,7 +537,6 @@ const StockWarningPage = () => {
               </button>
             </div>
           </div>
-        </div>
       </Modal>
 
       {/* 角落信息 */}

@@ -47,6 +47,7 @@ const StockOutPage = () => {
   const [formData, setFormData] = useState({
     material_code: '',
     out_quantity: '',
+    unit_price: '',
     out_value: '',
     out_type: 'production' as StockOutType,
     operator: '',
@@ -107,6 +108,7 @@ const StockOutPage = () => {
     setFormData({
       material_code: '',
       out_quantity: '',
+      unit_price: '',
       out_value: '',
       out_type: 'production',
       operator: '',
@@ -125,17 +127,20 @@ const StockOutPage = () => {
       message.error('请输入有效的出库数量')
       return
     }
-    if (!formData.out_value || Number(formData.out_value) < 0) {
-      message.error('请输入有效的出库价值')
+    if (!formData.unit_price || Number(formData.unit_price) < 0) {
+      message.error('请输入有效的单价')
       return
     }
+
+    // 计算出库价值 = 数量 * 单价
+    const calculatedValue = Number(formData.out_quantity) * Number(formData.unit_price)
 
     setModalLoading(true)
     try {
       const res = await createStockOut({
         material_code: formData.material_code,
         out_quantity: Number(formData.out_quantity),
-        out_value: Number(formData.out_value),
+        out_value: calculatedValue,
         out_type: formData.out_type,
         operator: formData.operator || undefined,
         remark: formData.remark || undefined,
@@ -353,7 +358,7 @@ const StockOutPage = () => {
       >
         <style>{`
           .stock-out-modal .ant-modal-content {
-            background: #000000 !important;
+            background: rgba(0, 0, 0, 0.95) !important;
             border: 2px solid rgba(79, 140, 255, 0.6) !important;
             border-radius: 12px !important;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(79, 140, 255, 0.3) !important;
@@ -361,13 +366,13 @@ const StockOutPage = () => {
             overflow: hidden !important;
           }
           .stock-out-modal .ant-modal-header {
-            background: #000000 !important;
+            background: rgba(0, 0, 0, 0.95) !important;
             border-bottom: 1px solid rgba(79, 140, 255, 0.4) !important;
             padding: 16px 20px !important;
             margin: 0 !important;
           }
           .stock-out-modal .ant-modal-body {
-            background: #000000 !important;
+            background: rgba(0, 0, 0, 0.95) !important;
             padding: 20px !important;
           }
           .stock-out-modal .ant-modal-title {
@@ -395,7 +400,7 @@ const StockOutPage = () => {
           .stock-out-modal .ant-modal-content,
           .stock-out-modal .ant-modal-header,
           .stock-out-modal .ant-modal-body {
-            background: #000000 !important;
+            background: rgba(0, 0, 0, 0.95) !important;
           }
         `}</style>
         <div className={styles.modalForm}>
@@ -444,15 +449,28 @@ const StockOutPage = () => {
           </div>
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label>出库价值 *</label>
+              <label>单价 *</label>
               <input
                 type="number"
                 step="0.01"
-                placeholder="请输入出库价值"
-                value={formData.out_value}
-                onChange={(e) => setFormData({ ...formData, out_value: e.target.value })}
+                placeholder="请输入单价"
+                value={formData.unit_price}
+                onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
               />
             </div>
+            <div className={styles.formGroup}>
+              <label>出库价值（自动计算）</label>
+              <input
+                type="text"
+                value={formData.out_quantity && formData.unit_price
+                  ? `¥${(Number(formData.out_quantity) * Number(formData.unit_price)).toFixed(2)}`
+                  : ''}
+                disabled
+                placeholder="数量 × 单价"
+              />
+            </div>
+          </div>
+          <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label>操作人</label>
               <input

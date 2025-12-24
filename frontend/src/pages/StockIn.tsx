@@ -55,16 +55,15 @@ const StockIn = () => {
     spec: '',
     unit: '',
     category: '',
-    supplier: '',
     max_stock: '',
     min_stock: '',
-    unit_price: '',
   })
 
   // 表单状态
   const [formData, setFormData] = useState({
     material_code: '',
     in_quantity: '',
+    unit_price: '',
     in_value: '',
     in_time: '',
     in_type: 'purchase' as InType,
@@ -127,10 +126,8 @@ const StockIn = () => {
       spec: '',
       unit: '',
       category: '',
-      supplier: '',
       max_stock: '',
       min_stock: '',
-      unit_price: '',
     })
     setMaterialModalVisible(true)
   }
@@ -154,15 +151,14 @@ const StockIn = () => {
         spec: materialForm.spec || undefined,
         unit: materialForm.unit || undefined,
         category: materialForm.category || undefined,
-        supplier: materialForm.supplier || undefined,
         max_stock: materialForm.max_stock ? Number(materialForm.max_stock) : undefined,
         min_stock: materialForm.min_stock ? Number(materialForm.min_stock) : undefined,
-        unit_price: materialForm.unit_price ? Number(materialForm.unit_price) : undefined,
       })
       if (res.code === 200) {
         message.success(res.message || '物料添加成功')
         setMaterialModalVisible(false)
         loadStockList()
+        loadStockInList()
       } else {
         message.error(res.message || '物料添加失败')
       }
@@ -178,6 +174,7 @@ const StockIn = () => {
     setFormData({
       material_code: '',
       in_quantity: '',
+      unit_price: '',
       in_value: '',
       in_time: '',
       in_type: 'purchase',
@@ -198,17 +195,20 @@ const StockIn = () => {
       message.error('入库数量必须大于0')
       return
     }
-    if (!formData.in_value) {
-      message.error('请输入入库价值')
+    if (!formData.unit_price || Number(formData.unit_price) < 0) {
+      message.error('请输入有效的单价')
       return
     }
+
+    // 计算入库价值 = 数量 * 单价
+    const calculatedValue = Number(formData.in_quantity) * Number(formData.unit_price)
 
     setLoading(true)
     try {
       const res = await createStockIn({
         material_code: formData.material_code,
         in_quantity: Number(formData.in_quantity),
-        in_value: Number(formData.in_value),
+        in_value: calculatedValue,
         in_type: formData.in_type,
         in_time: formData.in_time || undefined,
         supplier: formData.supplier || undefined,
@@ -439,19 +439,47 @@ const StockIn = () => {
 
       {/* 新增入库弹窗 */}
       <Modal
-        title={null}
+        title="新增入库"
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="stock-in-modal"
         width={520}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>新增入库</h3>
-          <p className={styles.modalSubtitle}>请填写入库信息</p>
-
-          <div className={styles.form}>
+        <style>{`
+          .stock-in-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(79, 140, 255, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(79, 140, 255, 0.3) !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+          }
+          .stock-in-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(79, 140, 255, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .stock-in-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .stock-in-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .stock-in-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .stock-in-modal .ant-modal-close:hover {
+            color: #4F8CFF !important;
+            background: rgba(79, 140, 255, 0.2) !important;
+          }
+        `}</style>
+        <div className={styles.form}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>物料编号 *</label>
               <select
@@ -502,19 +530,34 @@ const StockIn = () => {
 
             <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>入库价值 *</label>
+                <label className={styles.label}>单价 *</label>
                 <input
                   type="number"
                   className="cyber-input"
-                  placeholder="请输入入库价值"
-                  value={formData.in_value}
-                  onChange={(e) => setFormData({ ...formData, in_value: e.target.value })}
+                  placeholder="请输入单价"
+                  value={formData.unit_price}
+                  onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
                   disabled={loading}
                   min="0"
                   step="0.01"
                 />
               </div>
 
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>入库价值（自动计算）</label>
+                <input
+                  type="text"
+                  className="cyber-input"
+                  value={formData.in_quantity && formData.unit_price
+                    ? `¥${(Number(formData.in_quantity) * Number(formData.unit_price)).toFixed(2)}`
+                    : ''}
+                  disabled
+                  placeholder="数量 × 单价"
+                />
+              </div>
+            </div>
+
+            <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>供应商</label>
                 <input
@@ -526,9 +569,7 @@ const StockIn = () => {
                   disabled={loading}
                 />
               </div>
-            </div>
 
-            <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>操作人</label>
                 <input
@@ -540,17 +581,17 @@ const StockIn = () => {
                   disabled={loading}
                 />
               </div>
+            </div>
 
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>入库时间</label>
-                <input
-                  type="datetime-local"
-                  className="cyber-input"
-                  value={formData.in_time}
-                  onChange={(e) => setFormData({ ...formData, in_time: e.target.value })}
-                  disabled={loading}
-                />
-              </div>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>入库时间</label>
+              <input
+                type="datetime-local"
+                className="cyber-input"
+                value={formData.in_time}
+                onChange={(e) => setFormData({ ...formData, in_time: e.target.value })}
+                disabled={loading}
+              />
             </div>
 
             <div className={styles.inputGroup}>
@@ -583,25 +624,52 @@ const StockIn = () => {
               </button>
             </div>
           </div>
-        </div>
       </Modal>
 
       {/* 新增物料弹窗 */}
       <Modal
-        title={null}
+        title="新增物料"
         open={materialModalVisible}
         onCancel={() => setMaterialModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="stock-material-modal"
         width={560}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>新增物料</h3>
-          <p className={styles.modalSubtitle}>请填写物料基本信息</p>
-
-          <div className={styles.form}>
-            <div className={styles.inputRow}>
+        <style>{`
+          .stock-material-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(79, 140, 255, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(79, 140, 255, 0.3) !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+          }
+          .stock-material-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(79, 140, 255, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .stock-material-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .stock-material-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .stock-material-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .stock-material-modal .ant-modal-close:hover {
+            color: #4F8CFF !important;
+            background: rgba(79, 140, 255, 0.2) !important;
+          }
+        `}</style>
+        <div className={styles.form}>
+          <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>物料编号 *</label>
                 <input
@@ -664,20 +732,6 @@ const StockIn = () => {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>供应商</label>
-                <input
-                  type="text"
-                  className="cyber-input"
-                  placeholder="如: 华东五金厂"
-                  value={materialForm.supplier}
-                  onChange={(e) => setMaterialForm({ ...materialForm, supplier: e.target.value })}
-                  disabled={materialLoading}
-                />
-              </div>
-            </div>
-
-            <div className={styles.inputRow}>
-              <div className={styles.inputGroup}>
                 <label className={styles.label}>最小库存</label>
                 <input
                   type="number"
@@ -689,6 +743,9 @@ const StockIn = () => {
                   min="0"
                 />
               </div>
+            </div>
+
+            <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>最大库存</label>
                 <input
@@ -701,20 +758,7 @@ const StockIn = () => {
                   min="0"
                 />
               </div>
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>单价</label>
-              <input
-                type="number"
-                className="cyber-input"
-                placeholder="物料单价"
-                value={materialForm.unit_price}
-                onChange={(e) => setMaterialForm({ ...materialForm, unit_price: e.target.value })}
-                disabled={materialLoading}
-                min="0"
-                step="0.01"
-              />
+              <div className={styles.inputGroup}></div>
             </div>
 
             <div className={styles.modalActions}>
@@ -734,7 +778,6 @@ const StockIn = () => {
               </button>
             </div>
           </div>
-        </div>
       </Modal>
 
       {/* 角落信息 */}

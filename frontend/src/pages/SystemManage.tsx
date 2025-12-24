@@ -487,19 +487,46 @@ const SystemManage = () => {
 
       {/* 用户编辑弹窗 */}
       <Modal
-        title={null}
+        title={userModalType === 'create' ? '新增用户' : '编辑用户'}
         open={userModalVisible}
         onCancel={() => setUserModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="system-user-modal"
         width={500}
         centered
       >
+        <style>{`
+          .system-user-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(19, 194, 194, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(19, 194, 194, 0.3) !important;
+            padding: 0 !important;
+          }
+          .system-user-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(19, 194, 194, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .system-user-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .system-user-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .system-user-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .system-user-modal .ant-modal-close:hover {
+            color: #13C2C2 !important;
+            background: rgba(19, 194, 194, 0.2) !important;
+          }
+        `}</style>
         <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>
-            {userModalType === 'create' ? '新增用户' : '编辑用户'}
-          </h3>
-
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>用户名</label>
             <Input
@@ -574,21 +601,50 @@ const SystemManage = () => {
 
       {/* 重置密码弹窗 */}
       <Modal
-        title={null}
+        title="重置密码"
         open={resetPwdModalVisible}
         onCancel={() => setResetPwdModalVisible(false)}
         footer={null}
-        className={styles.modal}
+        rootClassName="system-reset-pwd-modal"
         width={400}
         centered
       >
-        <div className={styles.modalContent}>
-          <h3 className={styles.modalTitle}>重置密码</h3>
-          <p className={styles.modalDesc}>
-            为用户 <strong>{resetPwdUser?.username}</strong> 设置新密码
-          </p>
+        <style>{`
+          .system-reset-pwd-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(19, 194, 194, 0.6) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(19, 194, 194, 0.3) !important;
+            padding: 0 !important;
+          }
+          .system-reset-pwd-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(19, 194, 194, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .system-reset-pwd-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .system-reset-pwd-modal .ant-modal-title {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
+          }
+          .system-reset-pwd-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+          .system-reset-pwd-modal .ant-modal-close:hover {
+            color: #13C2C2 !important;
+            background: rgba(19, 194, 194, 0.2) !important;
+          }
+        `}</style>
+        <p className={styles.modalDesc}>
+          为用户 <strong>{resetPwdUser?.username}</strong> 设置新密码
+        </p>
 
-          <div className={styles.formGroup}>
+        <div className={styles.formGroup}>
             <label className={styles.formLabel}>新密码</label>
             <Input.Password
               value={newPassword}
@@ -613,7 +669,6 @@ const SystemManage = () => {
               {submitting ? '提交中...' : '确定'}
             </button>
           </div>
-        </div>
       </Modal>
     </div>
   )
