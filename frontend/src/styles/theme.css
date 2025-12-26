@@ -161,6 +161,10 @@ html, body {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .cyber-button:hover {
@@ -184,6 +188,10 @@ html, body {
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .cyber-button-ghost:hover {

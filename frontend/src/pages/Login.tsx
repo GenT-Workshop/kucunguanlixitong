@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { message, Spin } from 'antd'
 import {
@@ -22,9 +22,11 @@ const Login = () => {
   const { login, isLoggedIn } = useUser()
 
   // 如果已登录，跳转到主页
-  if (isLoggedIn) {
-    navigate('/dashboard')
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/dashboard')
+    }
+  }, [isLoggedIn, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

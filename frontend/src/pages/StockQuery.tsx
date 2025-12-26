@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { message, Table, Tag, Modal } from 'antd'
 import {
@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons'
 import { getStockList, getStockDetail } from '../api/stock'
 import type { Stock, StockStatus } from '../api/types'
+import { useAutoRefresh } from '../hooks/useAutoRefresh'
 import styles from './StockQuery.module.css'
 
 // 库存状态颜色映射
@@ -53,7 +54,7 @@ const StockQuery = () => {
   const [currentStock, setCurrentStock] = useState<Stock | null>(null)
 
   // 加载库存列表
-  const loadStockList = async () => {
+  const loadStockList = useCallback(async () => {
     setLoading(true)
     try {
       const res = await getStockList({
@@ -76,11 +77,14 @@ const StockQuery = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, pageSize, search, statusFilter, stockStatusFilter, supplierFilter, categoryFilter])
 
   useEffect(() => {
     loadStockList()
-  }, [page, statusFilter, stockStatusFilter])
+  }, [page, statusFilter, stockStatusFilter, loadStockList])
+
+  // 自动刷新数据（每2秒）
+  useAutoRefresh(loadStockList, { interval: 2000 })
 
   // 搜索
   const handleSearch = () => {

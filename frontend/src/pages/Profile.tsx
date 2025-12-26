@@ -29,19 +29,16 @@ const Profile = () => {
     return null
   }
 
-  // 模拟统计数据
+  // 统计数据 - 库存管理相关
   const stats = [
-    { label: '数据库', value: '12', icon: <DatabaseOutlined /> },
-    { label: '云服务', value: '8', icon: <CloudServerOutlined /> },
-    { label: '安全认证', value: '24', icon: <SafetyCertificateOutlined /> },
+    { label: '入库单', value: '-', icon: <DatabaseOutlined /> },
+    { label: '出库单', value: '-', icon: <CloudServerOutlined /> },
+    { label: '库存品类', value: '-', icon: <SafetyCertificateOutlined /> },
   ]
 
-  // 模拟活动记录
+  // 活动记录 - 库存管理相关
   const activities = [
-    { action: '创建了新数据库', time: '2小时前', type: 'create' },
-    { action: '更新了用户权限', time: '5小时前', type: 'update' },
-    { action: '备份了生产环境', time: '1天前', type: 'backup' },
-    { action: '删除了测试数据', time: '2天前', type: 'delete' },
+    { action: '登录系统', time: '刚刚', type: 'create' },
   ]
 
   // 退出登录
@@ -124,7 +121,7 @@ const Profile = () => {
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
-          <Link to="/login" className="nav-link">Home</Link>
+          <Link to="/dashboard" className="nav-link">Home</Link>
         </div>
       </header>
 

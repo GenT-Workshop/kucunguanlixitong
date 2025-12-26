@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { message } from 'antd'
 import {
@@ -104,10 +105,11 @@ const Dashboard = () => {
   const { user, logout, isLoggedIn } = useUser()
 
   // 未登录跳转到登录页
-  if (!isLoggedIn) {
-    navigate('/login')
-    return null
-  }
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login')
+    }
+  }, [isLoggedIn, navigate])
 
   const handleModuleClick = (module: typeof MODULES[0]) => {
     if (module.ready) {
@@ -121,6 +123,11 @@ const Dashboard = () => {
     await logout()
     message.success('已退出登录')
     navigate('/login')
+  }
+
+  // 未登录时不渲染内容
+  if (!isLoggedIn) {
+    return null
   }
 
   return (

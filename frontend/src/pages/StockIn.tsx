@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { message, Spin, Table, Modal, Tag } from 'antd'
 import {
@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons'
 import { createStockIn, getStockInList, getStockList, deleteStockIn, stockInit } from '../api/stock'
 import type { StockIn as StockInType, Stock, StockInType as InType } from '../api/types'
+import { useAutoRefresh } from '../hooks/useAutoRefresh'
 import styles from './StockIn.module.css'
 
 // 入库类型选项
@@ -73,7 +74,7 @@ const StockIn = () => {
   })
 
   // 加载入库记录列表
-  const loadStockInList = async () => {
+  const loadStockInList = useCallback(async () => {
     setTableLoading(true)
     try {
       const res = await getStockInList({
@@ -93,7 +94,7 @@ const StockIn = () => {
     } finally {
       setTableLoading(false)
     }
-  }
+  }, [page, pageSize, search, inTypeFilter])
 
   // 加载库存列表（用于选择物料）
   const loadStockList = async () => {
@@ -110,7 +111,10 @@ const StockIn = () => {
   useEffect(() => {
     loadStockInList()
     loadStockList()
-  }, [page, inTypeFilter])
+  }, [page, inTypeFilter, loadStockInList])
+
+  // 自动刷新数据（每2秒）
+  useAutoRefresh(loadStockInList, { interval: 2000 })
 
   // 搜索
   const handleSearch = () => {
@@ -320,7 +324,15 @@ const StockIn = () => {
       dataIndex: 'in_time',
       key: 'in_time',
       width: 160,
-      render: (val: string) => new Date(val).toLocaleString('zh-CN'),
+      render: (val: string) => {
+        const d = new Date(val)
+        const year = d.getFullYear()
+        const month = String(d.getMonth() + 1).padStart(2, '0')
+        const day = String(d.getDate()).padStart(2, '0')
+        const hour = String(d.getHours()).padStart(2, '0')
+        const minute = String(d.getMinutes()).padStart(2, '0')
+        return `${year}/${month}/${day} ${hour}:${minute}`
+      },
     },
     {
       title: '操作',

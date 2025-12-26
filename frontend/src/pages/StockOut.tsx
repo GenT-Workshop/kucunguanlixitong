@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { message, Spin, Modal, Tag } from 'antd'
 import {
@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons'
 import { getStockOutList, createStockOut, deleteStockOut, getStockList } from '../api/stock'
 import type { StockOut, Stock, StockOutType } from '../api/types'
+import { useAutoRefresh } from '../hooks/useAutoRefresh'
 import styles from './StockOut.module.css'
 
 // 出库类型选项
@@ -55,7 +56,7 @@ const StockOutPage = () => {
   })
 
   // 加载出库列表
-  const loadStockOutList = async () => {
+  const loadStockOutList = useCallback(async () => {
     setLoading(true)
     try {
       const res = await getStockOutList({
@@ -75,7 +76,7 @@ const StockOutPage = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, pageSize, search, outTypeFilter])
 
   // 加载库存列表（用于选择物料）
   const loadStockList = async () => {
@@ -91,7 +92,10 @@ const StockOutPage = () => {
 
   useEffect(() => {
     loadStockOutList()
-  }, [page, outTypeFilter])
+  }, [page, outTypeFilter, loadStockOutList])
+
+  // 自动刷新数据（每2秒）
+  useAutoRefresh(loadStockOutList, { interval: 2000 })
 
   useEffect(() => {
     loadStockList()
@@ -305,7 +309,7 @@ const StockOutPage = () => {
                           <td>{item.out_quantity}</td>
                           <td>¥{item.out_value}</td>
                           <td>{item.operator || '-'}</td>
-                          <td>{new Date(item.out_time).toLocaleString()}</td>
+                          <td>{new Date(item.out_time).toLocaleString('zh-CN')}</td>
                           <td>
                             <button
                               className={styles.deleteBtn}
