@@ -1,0 +1,33 @@
+#!/bin/bash
+# pre-push hook - 推送前检查分支命名规范
+
+set -e
+
+current_branch=$(git symbolic-ref --short HEAD)
+
+echo "🔍 检查分支命名规范..."
+
+# 标准格式检查
+if echo "$current_branch" | grep -qE '^(feature|fix|refactor|test|docs|hotfix|release)/[a-z0-9-]+$'; then
+    echo "✅ 分支命名符合规范: $current_branch"
+    exit 0
+fi
+
+# 保护分支检查
+if echo "$current_branch" | grep -qE '^(main|develop|production)$'; then
+    echo "✅ 保护分支: $current_branch"
+    exit 0
+fi
+
+# 不符合规范
+echo ""
+echo "❌ 分支命名不符合规范: $current_branch"
+echo ""
+echo "允许的格式："
+echo "  feature/xxx  - 新功能分支"
+echo "  fix/xxx      - Bug修复分支"
+echo "  refactor/xxx - 重构分支"
+echo ""
+echo "跳过检查: git push --no-verify"
+echo ""
+exit 1

@@ -1,0 +1,494 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$HI8AWaZAgX1yWilWqmVEmv$zzHqrPuAIjy3yE23hmxOJ+Nf/6vMjPs0mB0BN26/NuA=",
+    "last_login": "2025-12-21T09:44:35.504Z",
+    "is_superuser": false,
+    "username": "hzfa235h",
+    "first_name": "",
+    "last_name": "",
+    "email": "2662114381@qq.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-20T11:12:57.733Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$03iinfSmekPvQ75OYrSUul$fCJz+zrtwH1HJNB+r0kBYJeloyhh3m+zXMwXfxM0J40=",
+    "last_login": "2025-12-24T15:33:52.218Z",
+    "is_superuser": false,
+    "username": "26612114381@qq.com",
+    "first_name": "",
+    "last_name": "",
+    "email": "26612114381@qq.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-20T11:17:35.761Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$sbGBrK7ToFmYXoOORiMkbP$bUcJ0yFwads+xgmRoRPoY7eYPZBDnysHtfgTGCsSAMU=",
+    "last_login": "2025-12-21T09:32:14.008Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-12-21T06:28:40.339Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "xvej3hpisw2v1yzyu4opb8bt3kpjb06o",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQAP-yZ0OAhQI9evcNZIGtVA1NSnsy_t006UGvM5N5Q6R9q3HvvMa5wAgaLr8sUX5yO0R5ULsvIi9tW-ckjkSctovbUvh1Pdu_QaVeYQTvKLEug9TSYFBIWU6eUSombV1AzMYzWuuLwpRUcAoTTlIPFr0ynuDzBcOnNqA:1vYQs4:xuZRWQ0Npu2M4ZkNSvrOfRoGwgYaEy3lMOFHilYoY3k",
+    "expire_date": "2026-01-07T15:33:52.225Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 1,
+  "fields": {
+    "material_code": "M001",
+    "material_name": "螺丝钉",
+    "spec": "M6x20",
+    "unit": "个",
+    "category": "五金配件",
+    "supplier": "华东五金厂",
+    "max_stock": 10000,
+    "min_stock": 500,
+    "current_stock": 2000,
+    "unit_price": "0.50",
+    "stock_value": "1000.00",
+    "status": "active",
+    "created_at": "2025-12-20T18:08:10.618Z",
+    "updated_at": "2025-12-20T18:08:10.618Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 2,
+  "fields": {
+    "material_code": "M002",
+    "material_name": "电阻",
+    "spec": "10K 0805",
+    "unit": "个",
+    "category": "电子元器件",
+    "supplier": "深圳电子城",
+    "max_stock": 50000,
+    "min_stock": 5000,
+    "current_stock": 15205,
+    "unit_price": "0.02",
+    "stock_value": "564.00",
+    "status": "active",
+    "created_at": "2025-12-20T18:08:28.294Z",
+    "updated_at": "2025-12-20T18:08:28.294Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 3,
+  "fields": {
+    "material_code": "M003",
+    "material_name": "铝合金板",
+    "spec": "1000x500x2mm",
+    "unit": "张",
+    "category": "金属材料",
+    "supplier": "上海金属材料公司",
+    "max_stock": 500,
+    "min_stock": 50,
+    "current_stock": 120,
+    "unit_price": "85.00",
+    "stock_value": "10200.00",
+    "status": "active",
+    "created_at": "2025-12-20T18:08:28.298Z",
+    "updated_at": "2025-12-20T18:08:28.298Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 4,
+  "fields": {
+    "material_code": "M004",
+    "material_name": "润滑油",
+    "spec": "5L/桶",
+    "unit": "桶",
+    "category": "化工材料",
+    "supplier": "壳牌润滑油",
+    "max_stock": 100,
+    "min_stock": 10,
+    "current_stock": 10,
+    "unit_price": "120.00",
+    "stock_value": "982.00",
+    "status": "active",
+    "created_at": "2025-12-20T18:08:28.302Z",
+    "updated_at": "2025-12-20T18:08:28.302Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 5,
+  "fields": {
+    "material_code": "M005",
+    "material_name": "包装纸箱",
+    "spec": "40x30x20cm",
+    "unit": "个",
+    "category": "包装材料",
+    "supplier": "杭州纸业",
+    "max_stock": 2000,
+    "min_stock": 200,
+    "current_stock": 0,
+    "unit_price": "3.50",
+    "stock_value": "-1900.00",
+    "status": "active",
+    "created_at": "2025-12-20T18:08:28.304Z",
+    "updated_at": "2025-12-20T18:08:28.304Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 6,
+  "fields": {
+    "material_code": "K001",
+    "material_name": "螺母",
+    "spec": "",
+    "unit": "",
+    "category": "",
+    "supplier": "",
+    "max_stock": 10000,
+    "min_stock": 100,
+    "current_stock": 180,
+    "unit_price": "0.00",
+    "stock_value": "-2.00",
+    "status": "active",
+    "created_at": "2025-12-20T18:17:34.586Z",
+    "updated_at": "2025-12-20T18:17:34.586Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 7,
+  "fields": {
+    "material_code": "djkfndsifhds",
+    "material_name": "伟哥",
+    "spec": "",
+    "unit": "",
+    "category": "",
+    "supplier": "",
+    "max_stock": 454765,
+    "min_stock": 0,
+    "current_stock": 6355,
+    "unit_price": "0.00",
+    "stock_value": "4563456.00",
+    "status": "active",
+    "created_at": "2025-12-21T09:34:17.014Z",
+    "updated_at": "2025-12-21T09:34:17.014Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 8,
+  "fields": {
+    "material_code": "fgdfghdf",
+    "material_name": "萎哥",
+    "spec": "",
+    "unit": "",
+    "category": "",
+    "supplier": "",
+    "max_stock": 35646,
+    "min_stock": 0,
+    "current_stock": 35646,
+    "unit_price": "0.00",
+    "stock_value": "564645645.00",
+    "status": "active",
+    "created_at": "2025-12-21T09:39:17.531Z",
+    "updated_at": "2025-12-21T09:39:17.531Z"
+  }
+},
+{
+  "model": "stock.stock",
+  "pk": 9,
+  "fields": {
+    "material_code": "c123",
+    "material_name": "螺帽1",
+    "spec": "54*69",
+    "unit": "个",
+    "category": "五金",
+    "supplier": "",
+    "max_stock": 100000,
+    "min_stock": 100,
+    "current_stock": 10,
+    "unit_price": "0.00",
+    "stock_value": "-12500.00",
+    "status": "active",
+    "created_at": "2025-12-24T15:34:27.689Z",
+    "updated_at": "2025-12-24T15:34:27.689Z"
+  }
+},
+{
+  "model": "stock.stockin",
+  "pk": 1,
+  "fields": {
+    "bill_no": "IN-20251220-0001",
+    "stock": 5,
+    "material_code": "M005",
+    "material_name": "包装纸箱",
+    "supplier": "anan",
+    "in_time": "2025-12-20T18:09:00Z",
+    "in_quantity": 200,
+    "in_value": "800.00",
+    "in_type": "purchase",
+    "operator": "anan",
+    "remark": "cmd",
+    "created_at": "2025-12-20T18:09:50.182Z"
+  }
+},
+{
+  "model": "stock.stockin",
+  "pk": 2,
+  "fields": {
+    "bill_no": "IN-20251220-0002",
+    "stock": 2,
+    "material_code": "M002",
+    "material_name": "电阻",
+    "supplier": "anan",
+    "in_time": "2025-12-20T18:10:31.605Z",
+    "in_quantity": 205,
+    "in_value": "264.00",
+    "in_type": "return",
+    "operator": "anan",
+    "remark": "",
+    "created_at": "2025-12-20T18:10:31.607Z"
+  }
+},
+{
+  "model": "stock.stockin",
+  "pk": 3,
+  "fields": {
+    "bill_no": "IN-20251220-0003",
+    "stock": 6,
+    "material_code": "K001",
+    "material_name": "螺母",
+    "supplier": "",
+    "in_time": "2025-12-20T18:17:52.451Z",
+    "in_quantity": 200,
+    "in_value": "6.00",
+    "in_type": "production",
+    "operator": "",
+    "remark": "",
+    "created_at": "2025-12-20T18:17:52.453Z"
+  }
+},
+{
+  "model": "stock.stockin",
+  "pk": 4,
+  "fields": {
+    "bill_no": "IN-20251221-0001",
+    "stock": 7,
+    "material_code": "djkfndsifhds",
+    "material_name": "伟哥",
+    "supplier": "46456",
+    "in_time": "2025-12-21T09:37:38.953Z",
+    "in_quantity": 6355,
+    "in_value": "4563456.00",
+    "in_type": "purchase",
+    "operator": "456456",
+    "remark": "",
+    "created_at": "2025-12-21T09:37:38.955Z"
+  }
+},
+{
+  "model": "stock.stockin",
+  "pk": 5,
+  "fields": {
+    "bill_no": "IN-20251221-0002",
+    "stock": 8,
+    "material_code": "fgdfghdf",
+    "material_name": "萎哥",
+    "supplier": "对方首都建康然后",
+    "in_time": "2025-12-21T09:41:16.323Z",
+    "in_quantity": 35646,
+    "in_value": "564645645.00",
+    "in_type": "production",
+    "operator": "安抚的",
+    "remark": "",
+    "created_at": "2025-12-21T09:41:16.325Z"
+  }
+},
+{
+  "model": "stock.stockin",
+  "pk": 6,
+  "fields": {
+    "bill_no": "IN-20251221-0003",
+    "stock": 4,
+    "material_code": "M004",
+    "material_name": "润滑油",
+    "supplier": "壳牌润滑油",
+    "in_time": "2025-12-21T09:51:11.183Z",
+    "in_quantity": 2,
+    "in_value": "22.00",
+    "in_type": "production",
+    "operator": "",
+    "remark": "",
+    "created_at": "2025-12-21T09:51:11.185Z"
+  }
+},
+{
+  "model": "stock.stockin",
+  "pk": 7,
+  "fields": {
+    "bill_no": "IN-20251224-0001",
+    "stock": 9,
+    "material_code": "c123",
+    "material_name": "螺帽1",
+    "supplier": "123",
+    "in_time": "2025-12-24T15:34:43.174Z",
+    "in_quantity": 150,
+    "in_value": "1500.00",
+    "in_type": "production",
+    "operator": "anan",
+    "remark": "",
+    "created_at": "2025-12-24T15:34:43.218Z"
+  }
+},
+{
+  "model": "stock.stockout",
+  "pk": 1,
+  "fields": {
+    "bill_no": "OUT-20251220-0001",
+    "stock": 5,
+    "material_code": "M005",
+    "material_name": "包装纸箱",
+    "out_time": "2025-12-20T18:11:08.086Z",
+    "out_quantity": 2000,
+    "out_value": "9000.00",
+    "out_type": "sales",
+    "operator": "123",
+    "remark": "",
+    "created_at": "2025-12-20T18:11:08.088Z"
+  }
+},
+{
+  "model": "stock.stockout",
+  "pk": 2,
+  "fields": {
+    "bill_no": "OUT-20251220-0002",
+    "stock": 6,
+    "material_code": "K001",
+    "material_name": "螺母",
+    "out_time": "2025-12-20T18:18:12.152Z",
+    "out_quantity": 20,
+    "out_value": "8.00",
+    "out_type": "production",
+    "operator": "",
+    "remark": "",
+    "created_at": "2025-12-20T18:18:12.154Z"
+  }
+},
+{
+  "model": "stock.stockout",
+  "pk": 3,
+  "fields": {
+    "bill_no": "OUT-20251224-0001",
+    "stock": 9,
+    "material_code": "c123",
+    "material_name": "螺帽1",
+    "out_time": "2025-12-24T15:35:33.824Z",
+    "out_quantity": 140,
+    "out_value": "14000.00",
+    "out_type": "sales",
+    "operator": "",
+    "remark": "",
+    "created_at": "2025-12-24T15:35:33.826Z"
+  }
+},
+{
+  "model": "stock.stockwarning",
+  "pk": 1,
+  "fields": {
+    "stock": 5,
+    "material_code": "M005",
+    "material_name": "包装纸箱",
+    "warning_type": "low",
+    "level": "danger",
+    "current_stock": 0,
+    "min_stock": 200,
+    "max_stock": 2000,
+    "status": "pending",
+    "handled_by": "",
+    "handled_at": null,
+    "remark": "",
+    "created_at": "2025-12-21T05:57:36.431Z"
+  }
+},
+{
+  "model": "stock.stockwarning",
+  "pk": 2,
+  "fields": {
+    "stock": 4,
+    "material_code": "M004",
+    "material_name": "润滑油",
+    "warning_type": "low",
+    "level": "warning",
+    "current_stock": 8,
+    "min_stock": 10,
+    "max_stock": 100,
+    "status": "pending",
+    "handled_by": "",
+    "handled_at": null,
+    "remark": "",
+    "created_at": "2025-12-21T05:57:36.437Z"
+  }
+},
+{
+  "model": "stock.stockwarning",
+  "pk": 3,
+  "fields": {
+    "stock": 8,
+    "material_code": "fgdfghdf",
+    "material_name": "萎哥",
+    "warning_type": "high",
+    "level": "warning",
+    "current_stock": 35646,
+    "min_stock": 0,
+    "max_stock": 35646,
+    "status": "pending",
+    "handled_by": "",
+    "handled_at": null,
+    "remark": "",
+    "created_at": "2025-12-21T09:43:21.090Z"
+  }
+},
+{
+  "model": "stock.stockwarning",
+  "pk": 4,
+  "fields": {
+    "stock": 9,
+    "material_code": "c123",
+    "material_name": "螺帽1",
+    "warning_type": "low",
+    "level": "danger",
+    "current_stock": 10,
+    "min_stock": 100,
+    "max_stock": 100000,
+    "status": "pending",
+    "handled_by": "",
+    "handled_at": null,
+    "remark": "",
+    "created_at": "2025-12-24T15:35:39.212Z"
+  }
+}
+]

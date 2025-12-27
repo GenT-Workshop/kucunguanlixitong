@@ -94,6 +94,40 @@ export async function resetUserPassword(
   })
 }
 
+// ==================== 角色管理接口 ====================
+
+export interface Role {
+  id: number
+  name: string
+  display_name: string
+  description?: string
+  is_active?: boolean
+}
+
+/**
+ * 获取角色列表
+ */
+export async function getRoleList(): Promise<ApiResponse<{ list: Role[] }>> {
+  return request<{ list: Role[] }>('/roles/')
+}
+
+/**
+ * 获取用户角色
+ */
+export async function getUserRoles(userId: number): Promise<ApiResponse<{ roles: Role[] }>> {
+  return request<{ roles: Role[] }>(`/users/${userId}/roles/`)
+}
+
+/**
+ * 设置用户角色
+ */
+export async function setUserRoles(userId: number, roleIds: number[]): Promise<ApiResponse<null>> {
+  return request<null>(`/users/${userId}/roles/`, {
+    method: 'POST',
+    body: JSON.stringify({ role_ids: roleIds }),
+  })
+}
+
 // 导出所有接口
 export default {
   getUserList,

@@ -44,6 +44,7 @@ async function request<T>(
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     ...options,
   })
   return response.json()

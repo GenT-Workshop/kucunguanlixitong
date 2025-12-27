@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from .models import Stock, StockIn, StockOut, StockWarning, StockCountTask, StockCountItem
+from apps.accounts.permissions import require_permission, require_any_permission
 
 
 def _json_response(data=None, message="success", code=200):
@@ -63,6 +64,7 @@ DIFF_TYPE_DISPLAY = {'gain': '盘盈', 'loss': '盘亏', 'none': '无差异'}
 
 @csrf_exempt
 @require_POST
+@require_permission('material:create')
 def stock_init_view(request):
     payload = _parse_json_body(request)
     if payload is None:
@@ -100,6 +102,7 @@ def stock_init_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_query:view')
 def stock_list_view(request):
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))
@@ -140,6 +143,7 @@ def stock_list_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_query:view')
 def stock_detail_view(request, pk):
     stock = get_object_or_404(Stock, pk=pk)
     s_status = _get_stock_status(stock)
@@ -156,6 +160,7 @@ def stock_detail_view(request, pk):
 
 @csrf_exempt
 @require_POST
+@require_permission('stock_in:create')
 def stock_in_create_view(request):
     payload = _parse_json_body(request)
     if payload is None:
@@ -232,6 +237,7 @@ def stock_in_create_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_in:view')
 def stock_in_list_view(request):
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))
@@ -277,6 +283,7 @@ def stock_in_list_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_in:view')
 def stock_in_detail_view(request, pk):
     stock_in = get_object_or_404(StockIn, pk=pk)
     return _json_response(data={
@@ -293,6 +300,7 @@ def stock_in_detail_view(request, pk):
 
 @csrf_exempt
 @require_http_methods(["DELETE"])
+@require_permission('stock_in:delete')
 def stock_in_delete_view(request, pk):
     stock_in = get_object_or_404(StockIn, pk=pk)
     stock = stock_in.stock
@@ -310,6 +318,7 @@ def stock_in_delete_view(request, pk):
 
 @csrf_exempt
 @require_POST
+@require_permission('stock_out:create')
 def stock_out_create_view(request):
     payload = _parse_json_body(request)
     if payload is None:
@@ -381,6 +390,7 @@ def stock_out_create_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_out:view')
 def stock_out_list_view(request):
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))
@@ -423,6 +433,7 @@ def stock_out_list_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_out:view')
 def stock_out_detail_view(request, pk):
     stock_out = get_object_or_404(StockOut, pk=pk)
     return _json_response(data={
@@ -439,6 +450,7 @@ def stock_out_detail_view(request, pk):
 
 @csrf_exempt
 @require_http_methods(["DELETE"])
+@require_permission('stock_out:delete')
 def stock_out_delete_view(request, pk):
     stock_out = get_object_or_404(StockOut, pk=pk)
     with transaction.atomic():
@@ -454,6 +466,7 @@ def stock_out_delete_view(request, pk):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_warning:view')
 def warning_list_view(request):
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))
@@ -485,6 +498,7 @@ def warning_list_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_warning:view')
 def warning_statistics_view(request):
     return _json_response(data={
         "by_type": {"low": StockWarning.objects.filter(warning_type='low').count(),
@@ -500,6 +514,7 @@ def warning_statistics_view(request):
 
 @csrf_exempt
 @require_POST
+@require_permission('stock_warning:check')
 def warning_check_view(request):
     new_warnings = []
     cleared_warnings = []
@@ -575,6 +590,7 @@ def _generate_task_no():
 
 @csrf_exempt
 @require_POST
+@require_permission('stock_count:create')
 def stock_count_task_create_view(request):
     payload = _parse_json_body(request)
     if payload is None:
@@ -600,6 +616,7 @@ def stock_count_task_create_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_count:view')
 def stock_count_task_list_view(request):
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))
@@ -627,6 +644,7 @@ def stock_count_task_list_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('stock_count:view')
 def stock_count_task_detail_view(request, pk):
     task = get_object_or_404(StockCountTask, pk=pk)
     items = [{
@@ -649,6 +667,7 @@ def stock_count_task_detail_view(request, pk):
 
 @csrf_exempt
 @require_POST
+@require_permission('stock_count:submit')
 def stock_count_item_submit_view(request):
     payload = _parse_json_body(request)
     if payload is None:
@@ -692,6 +711,7 @@ def stock_count_item_submit_view(request):
 
 @csrf_exempt
 @require_POST
+@require_permission('stock_count:complete')
 def stock_count_task_complete_view(request, pk):
     task = get_object_or_404(StockCountTask, pk=pk)
     if task.status == 'done':
@@ -754,6 +774,7 @@ def stock_count_task_complete_view(request, pk):
 
 @csrf_exempt
 @require_POST
+@require_permission('stock_count:complete')
 def stock_count_task_cancel_view(request, pk):
     task = get_object_or_404(StockCountTask, pk=pk)
     if task.status == 'done':
@@ -770,6 +791,7 @@ def stock_count_task_cancel_view(request, pk):
 
 @csrf_exempt
 @require_GET
+@require_permission('statistics:view')
 def statistics_overview_view(request):
     active_stocks = Stock.objects.filter(status='active')
     stock_stats = active_stocks.aggregate(
@@ -803,6 +825,7 @@ def statistics_overview_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('statistics:view')
 def statistics_trend_view(request):
     days = int(request.GET.get("days", 7))
     end_date = timezone.now().date()
@@ -821,6 +844,7 @@ def statistics_trend_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('statistics:view')
 def statistics_ranking_view(request):
     rank_type = request.GET.get("type", "in")
     limit = int(request.GET.get("limit", 10))
@@ -837,6 +861,7 @@ def statistics_ranking_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('statistics:view')
 def statistics_category_view(request):
     stats = list(Stock.objects.filter(status='active').values('category').annotate(
         count=Count('id'), total_qty=Sum('current_stock'), total_value=Sum('stock_value'),
@@ -848,6 +873,7 @@ def statistics_category_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('monthly_report:view')
 def monthly_report_list_view(request):
     end_date = timezone.now().date()
     start_date = end_date.replace(day=1) - timezone.timedelta(days=365)
@@ -880,6 +906,7 @@ def monthly_report_list_view(request):
 
 @csrf_exempt
 @require_GET
+@require_permission('monthly_report:view')
 def monthly_report_detail_view(request):
     month_str = request.GET.get("month", timezone.now().strftime('%Y-%m'))
     try:

@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from .permissions import get_user_roles, get_user_modules, get_user_permissions
+
 
 def _json_response(data=None, message="success", code=200):
     """统一响应格式"""
@@ -54,12 +56,22 @@ def login_view(request):
         return _json_error("用户名或密码错误", 401)
 
     login(request, user)
+
+    # 获取用户角色和权限
+    roles = get_user_roles(user)
+    modules = get_user_modules(user)
+    permissions = list(get_user_permissions(user))
+
     return _json_response(
         data={
             "id": user.id,
             "username": user.get_username(),
             "email": user.email,
             "is_staff": user.is_staff,
+            "is_superuser": user.is_superuser,
+            "roles": [{"name": r.name, "display_name": r.display_name} for r in roles],
+            "modules": modules,
+            "permissions": permissions,
         },
         message="登录成功"
     )
@@ -131,13 +143,20 @@ def profile_view(request):
 
     if request.method == "GET":
         user = request.user
+        roles = get_user_roles(user)
+        modules = get_user_modules(user)
+        permissions = list(get_user_permissions(user))
         return _json_response(data={
             "id": user.id,
             "username": user.username,
             "email": user.email,
             "is_staff": user.is_staff,
+            "is_superuser": user.is_superuser,
             "date_joined": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
             "last_login": user.last_login.strftime("%Y-%m-%d %H:%M:%S") if user.last_login else None,
+            "roles": [{"name": r.name, "display_name": r.display_name} for r in roles],
+            "modules": modules,
+            "permissions": permissions,
         })
 
     elif request.method == "PUT":
@@ -469,3 +488,87 @@ def user_reset_password_view(request, pk):
     u.save()
 
     return _json_response(message="密码重置成功")
+
+
+# ==================== 角色管理接口 ====================
+
+from .models import Role, Permission, RolePermission, UserRole
+
+
+@csrf_exempt
+def role_list_view(request):
+    """获取角色列表"""
+    if request.method != "GET":
+        return _json_error("仅支持 GET 请求", 405)
+
+    is_admin, error = _check_admin(request)
+    if not is_admin:
+        return error
+
+    roles = Role.objects.all()
+    role_list = [{
+        "id": r.id,
+        "name": r.name,
+        "display_name": r.display_name,
+        "description": r.description,
+        "is_active": r.is_active,
+    } for r in roles]
+
+    return _json_response(data={"list": role_list})
+
+
+@csrf_exempt
+def permission_list_view(request):
+    """获取权限列表"""
+    if request.method != "GET":
+        return _json_error("仅支持 GET 请求", 405)
+
+    is_admin, error = _check_admin(request)
+    if not is_admin:
+        return error
+
+    permissions = Permission.objects.all()
+    perm_list = [{
+        "id": p.id,
+        "code": p.code,
+        "name": p.name,
+        "module": p.module,
+    } for p in permissions]
+
+    return _json_response(data={"list": perm_list})
+
+
+@csrf_exempt
+def user_role_view(request, pk):
+    """获取/设置用户角色"""
+    is_admin, error = _check_admin(request)
+    if not is_admin:
+        return error
+
+    try:
+        u = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return _json_error("用户不存在", 404)
+
+    if request.method == "GET":
+        user_roles = UserRole.objects.filter(user=u).select_related('role')
+        roles = [{"id": ur.role.id, "name": ur.role.name, "display_name": ur.role.display_name} for ur in user_roles]
+        return _json_response(data={"roles": roles})
+
+    elif request.method == "POST":
+        payload = _parse_json_body(request)
+        if payload is None:
+            return _json_error("请求体需要是 JSON", 400)
+
+        role_ids = payload.get("role_ids", [])
+        UserRole.objects.filter(user=u).delete()
+        for rid in role_ids:
+            try:
+                role = Role.objects.get(pk=rid)
+                UserRole.objects.create(user=u, role=role)
+            except Role.DoesNotExist:
+                pass
+
+        return _json_response(message="用户角色更新成功")
+
+    return _json_error("不支持的请求方法", 405)
