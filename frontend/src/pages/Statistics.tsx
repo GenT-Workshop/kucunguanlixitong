@@ -48,7 +48,53 @@ const Statistics = () => {
     try {
       const res = await getStatisticsTrend(trendDays)
       if (res.code === 200 && res.data) {
-        setTrendData(res.data)
+        // 后端返回 {in_trend: [...], out_trend: [...]}，需要合并成前端需要的格式
+        const rawData = res.data as unknown as {
+          in_trend: { date: string; qty: number; value: string }[]
+          out_trend: { date: string; qty: number; value: string }[]
+        }
+
+        // 收集所有日期
+        const dateMap = new Map<string, TrendDataItem>()
+
+        // 处理入库数据
+        rawData.in_trend?.forEach(item => {
+          dateMap.set(item.date, {
+            date: item.date,
+            in_qty: item.qty || 0,
+            in_value: item.value || '0',
+            in_count: 0,
+            out_qty: 0,
+            out_value: '0',
+            out_count: 0,
+          })
+        })
+
+        // 处理出库数据
+        rawData.out_trend?.forEach(item => {
+          const existing = dateMap.get(item.date)
+          if (existing) {
+            existing.out_qty = item.qty || 0
+            existing.out_value = item.value || '0'
+          } else {
+            dateMap.set(item.date, {
+              date: item.date,
+              in_qty: 0,
+              in_value: '0',
+              in_count: 0,
+              out_qty: item.qty || 0,
+              out_value: item.value || '0',
+              out_count: 0,
+            })
+          }
+        })
+
+        // 按日期排序
+        const mergedData = Array.from(dateMap.values()).sort((a, b) =>
+          a.date.localeCompare(b.date)
+        )
+
+        setTrendData(mergedData)
       }
     } catch {
       console.error('获取趋势数据失败')
@@ -59,7 +105,7 @@ const Statistics = () => {
   const loadRanking = async () => {
     try {
       const res = await getStatisticsRanking({ type: rankingType, order_by: 'qty', days: 30, limit: 10 })
-      if (res.code === 200 && res.data) {
+      if (res.code === 200 && res.data && Array.isArray(res.data.list)) {
         setRankingData(res.data.list)
       }
     } catch {
@@ -71,7 +117,7 @@ const Statistics = () => {
   const loadCategory = async () => {
     try {
       const res = await getStatisticsCategory()
-      if (res.code === 200 && res.data) {
+      if (res.code === 200 && Array.isArray(res.data)) {
         setCategoryData(res.data)
       }
     } catch {

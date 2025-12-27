@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { message, Table, Tag, Modal, Spin } from 'antd'
+import { message, Table, Tag, Spin } from 'antd'
 import {
   ThunderboltOutlined,
   StarOutlined,
   SearchOutlined,
-  ReloadOutlined,
   AlertOutlined,
-  CheckOutlined,
-  CloseOutlined,
   SyncOutlined,
   LoadingOutlined,
 } from '@ant-design/icons'
-import { getWarningList, handleWarning, getWarningStatistics, checkWarnings } from '../api/stock'
-import type { StockWarning as StockWarningType, WarningType, WarningLevel, WarningStatus, WarningStatistics } from '../api/types'
+import { getWarningList, getWarningStatistics, checkWarnings } from '../api/stock'
+import type { StockWarning as StockWarningType, WarningType, WarningStatistics } from '../api/types'
 import styles from './StockWarning.module.css'
 
 // 预警类型颜色映射
@@ -22,39 +19,11 @@ const WARNING_TYPE_COLORS: Record<WarningType, string> = {
   high: 'orange',
 }
 
-// 预警级别颜色映射
-const LEVEL_COLORS: Record<WarningLevel, string> = {
-  warning: 'orange',
-  danger: 'red',
-}
-
-// 预警状态颜色映射
-const STATUS_COLORS: Record<WarningStatus, string> = {
-  pending: 'blue',
-  handled: 'green',
-  ignored: 'default',
-}
-
 // 预警类型选项
 const WARNING_TYPE_OPTIONS = [
   { value: '', label: '全部类型' },
   { value: 'low', label: '库存不足' },
   { value: 'high', label: '库存过高' },
-]
-
-// 预警级别选项
-const LEVEL_OPTIONS = [
-  { value: '', label: '全部级别' },
-  { value: 'warning', label: '警告' },
-  { value: 'danger', label: '危险' },
-]
-
-// 预警状态选项
-const STATUS_OPTIONS = [
-  { value: '', label: '全部状态' },
-  { value: 'pending', label: '待处理' },
-  { value: 'handled', label: '已处理' },
-  { value: 'ignored', label: '已忽略' },
 ]
 
 const StockWarningPage = () => {
@@ -65,29 +34,12 @@ const StockWarningPage = () => {
   const [pageSize] = useState(10)
   const [search, setSearch] = useState('')
   const [warningTypeFilter, setWarningTypeFilter] = useState<WarningType | ''>('')
-  const [levelFilter, setLevelFilter] = useState<WarningLevel | ''>('')
-  const [statusFilter, setStatusFilter] = useState<WarningStatus | ''>('')
 
   // 统计数据
   const [statistics, setStatistics] = useState<WarningStatistics | null>(null)
 
-  // 处理弹窗
-  const [handleModalVisible, setHandleModalVisible] = useState(false)
-  const [handleLoading, setHandleLoading] = useState(false)
-  const [currentWarning, setCurrentWarning] = useState<StockWarningType | null>(null)
-  const [handleForm, setHandleForm] = useState({
-    action: 'handle' as 'handle' | 'ignore',
-    handled_by: '',
-    remark: '',
-  })
-
   // 检查预警loading
   const [checkLoading, setCheckLoading] = useState(false)
-
-  // 判断库存是否在合理范围内
-  const isStockNormal = (record: StockWarningType) => {
-    return record.current_stock >= record.min_stock && record.current_stock <= record.max_stock
-  }
 
   // 加载预警列表
   const loadWarningList = async () => {
@@ -98,13 +50,11 @@ const StockWarningPage = () => {
         page_size: pageSize,
         search: search || undefined,
         warning_type: warningTypeFilter || undefined,
-        level: levelFilter || undefined,
-        status: statusFilter || undefined,
       })
       if (res.code === 200 && res.data) {
         // 过滤掉库存已恢复正常的记录，只显示异常的预警
         const abnormalList = res.data.list.filter((item: StockWarningType) => {
-          return item.current_stock < item.min_stock || item.current_stock > item.max_stock
+          return item.current_stock <= item.min_stock || item.current_stock >= item.max_stock
         })
         setWarningList(abnormalList)
         setTotal(abnormalList.length)
@@ -130,10 +80,27 @@ const StockWarningPage = () => {
     }
   }
 
+  // 首次加载时自动检查预警
+  useEffect(() => {
+    const initLoad = async () => {
+      // 先检查预警，生成新的预警记录
+      try {
+        await checkWarnings()
+      } catch {
+        // 忽略检查失败，继续加载列表
+      }
+      // 然后加载列表和统计
+      loadWarningList()
+      loadStatistics()
+    }
+    initLoad()
+  }, [])
+
+  // 筛选条件变化时重新加载
   useEffect(() => {
     loadWarningList()
     loadStatistics()
-  }, [page, warningTypeFilter, levelFilter, statusFilter])
+  }, [page, warningTypeFilter])
 
   // 搜索
   const handleSearch = () => {
@@ -157,39 +124,6 @@ const StockWarningPage = () => {
       message.error('检查预警失败')
     } finally {
       setCheckLoading(false)
-    }
-  }
-
-  // 打开处理弹窗
-  const openHandleModal = (record: StockWarningType, action: 'handle' | 'ignore') => {
-    setCurrentWarning(record)
-    setHandleForm({
-      action,
-      handled_by: '',
-      remark: '',
-    })
-    setHandleModalVisible(true)
-  }
-
-  // 提交处理
-  const handleSubmit = async () => {
-    if (!currentWarning) return
-
-    setHandleLoading(true)
-    try {
-      const res = await handleWarning(currentWarning.id, handleForm)
-      if (res.code === 200) {
-        message.success(res.message || '处理成功')
-        setHandleModalVisible(false)
-        loadWarningList()
-        loadStatistics()
-      } else {
-        message.error(res.message || '处理失败')
-      }
-    } catch {
-      message.error('处理失败')
-    } finally {
-      setHandleLoading(false)
     }
   }
 
@@ -220,17 +154,6 @@ const StockWarningPage = () => {
       ),
     },
     {
-      title: '级别',
-      dataIndex: 'level',
-      key: 'level',
-      width: 80,
-      render: (val: WarningLevel, record: StockWarningType) => (
-        <Tag color={LEVEL_COLORS[val] || 'default'}>
-          {record.level_display || val}
-        </Tag>
-      ),
-    },
-    {
       title: '当前库存',
       dataIndex: 'current_stock',
       key: 'current_stock',
@@ -244,67 +167,6 @@ const StockWarningPage = () => {
       render: (_: unknown, record: StockWarningType) => (
         <span>{record.min_stock} / {record.max_stock}</span>
       ),
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 90,
-      render: (_val: WarningStatus, record: StockWarningType) => {
-        // 如果库存已恢复正常，动态显示为已处理
-        if (isStockNormal(record)) {
-          return <Tag color="green">已处理</Tag>
-        }
-        return (
-          <Tag color={STATUS_COLORS[record.status] || 'default'}>
-            {record.status_display || record.status}
-          </Tag>
-        )
-      },
-    },
-    {
-      title: '处理人',
-      dataIndex: 'handled_by',
-      key: 'handled_by',
-      width: 80,
-      render: (val: string) => val || '-',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 140,
-      render: (_: unknown, record: StockWarningType) => {
-        // 如果库存已恢复正常，显示已处理
-        if (isStockNormal(record)) {
-          return <span className={styles.handledText}>已处理</span>
-        }
-        // 待处理状态显示操作按钮
-        if (record.status === 'pending') {
-          return (
-            <div className={styles.actionBtns}>
-              <button
-                className={styles.handleBtn}
-                onClick={() => openHandleModal(record, 'handle')}
-                title="处理"
-              >
-                <CheckOutlined />
-              </button>
-              <button
-                className={styles.ignoreBtn}
-                onClick={() => openHandleModal(record, 'ignore')}
-                title="忽略"
-              >
-                <CloseOutlined />
-              </button>
-            </div>
-          )
-        }
-        return (
-          <span className={styles.handledText}>
-            {record.status === 'handled' ? '已处理' : '已忽略'}
-          </span>
-        )
-      },
     },
   ]
 
@@ -396,17 +258,6 @@ const StockWarningPage = () => {
                     </option>
                   ))}
                 </select>
-                <select
-                  className={`cyber-input ${styles.filterSelect}`}
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as WarningStatus | '')}
-                >
-                  {STATUS_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
                 <button
                   className={`cyber-button ${styles.checkBtn}`}
                   onClick={handleCheckWarnings}
@@ -444,100 +295,6 @@ const StockWarningPage = () => {
           </div>
         </div>
       </main>
-
-      {/* 处理弹窗 */}
-      <Modal
-        title={handleForm.action === 'handle' ? '处理预警' : '忽略预警'}
-        open={handleModalVisible}
-        onCancel={() => setHandleModalVisible(false)}
-        footer={null}
-        rootClassName="stock-warning-modal"
-        width={480}
-        centered
-      >
-        <style>{`
-          .stock-warning-modal .ant-modal-content {
-            background: rgba(0, 0, 0, 0.95) !important;
-            border: 2px solid rgba(250, 140, 22, 0.6) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(250, 140, 22, 0.3) !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-          }
-          .stock-warning-modal .ant-modal-header {
-            background: rgba(0, 0, 0, 0.95) !important;
-            border-bottom: 1px solid rgba(250, 140, 22, 0.4) !important;
-            padding: 16px 20px !important;
-            margin: 0 !important;
-          }
-          .stock-warning-modal .ant-modal-body {
-            background: rgba(0, 0, 0, 0.95) !important;
-            padding: 20px !important;
-          }
-          .stock-warning-modal .ant-modal-title {
-            color: #ffffff !important;
-            font-size: 18px !important;
-            font-weight: 600 !important;
-          }
-          .stock-warning-modal .ant-modal-close {
-            color: #ffffff !important;
-          }
-          .stock-warning-modal .ant-modal-close:hover {
-            color: #FA8C16 !important;
-            background: rgba(250, 140, 22, 0.2) !important;
-          }
-        `}</style>
-        <p className={styles.modalSubtitle}>
-          {currentWarning?.material_code} - {currentWarning?.material_name}
-        </p>
-        <div className={styles.form}>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>处理人</label>
-              <input
-                type="text"
-                className="cyber-input"
-                placeholder="请输入处理人"
-                value={handleForm.handled_by}
-                onChange={(e) => setHandleForm({ ...handleForm, handled_by: e.target.value })}
-                disabled={handleLoading}
-              />
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>备注</label>
-              <textarea
-                className="cyber-input"
-                placeholder="请输入备注（可选）"
-                value={handleForm.remark}
-                onChange={(e) => setHandleForm({ ...handleForm, remark: e.target.value })}
-                disabled={handleLoading}
-                rows={3}
-                style={{ resize: 'none' }}
-              />
-            </div>
-
-            <div className={styles.modalActions}>
-              <button
-                className="cyber-button-ghost"
-                onClick={() => setHandleModalVisible(false)}
-                disabled={handleLoading}
-              >
-                取消
-              </button>
-              <button
-                className={`cyber-button ${handleForm.action === 'ignore' ? styles.ignoreSubmitBtn : ''}`}
-                onClick={handleSubmit}
-                disabled={handleLoading}
-              >
-                {handleLoading ? (
-                  <Spin indicator={<LoadingOutlined style={{ color: '#fff' }} />} />
-                ) : (
-                  handleForm.action === 'handle' ? '确认处理' : '确认忽略'
-                )}
-              </button>
-            </div>
-          </div>
-      </Modal>
 
       {/* 角落信息 */}
       <div className="corner-info bottom-left">
