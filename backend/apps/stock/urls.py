@@ -13,7 +13,6 @@ from .views import (
     stock_out_detail_view,
     stock_out_delete_view,
     warning_list_view,
-    warning_handle_view,
     warning_statistics_view,
     warning_check_view,
     stock_count_task_create_view,
@@ -47,7 +46,6 @@ urlpatterns = [
     path("stock-out/<int:pk>/delete/", stock_out_delete_view, name="stock_out_delete"),
     # 预警接口
     path("warnings/", warning_list_view, name="warning_list"),
-    path("warnings/<int:pk>/handle/", warning_handle_view, name="warning_handle"),
     path("warnings/statistics/", warning_statistics_view, name="warning_statistics"),
     path("warnings/check/", warning_check_view, name="warning_check"),
     # 盘点接口

@@ -822,17 +822,21 @@ def statistics_trend_view(request):
 @csrf_exempt
 @require_GET
 def statistics_ranking_view(request):
-    rank_type = request.GET.get("type", "in")
-    limit = int(request.GET.get("limit", 10))
+      rank_type = request.GET.get("type", "in")
+      limit = int(request.GET.get("limit", 10))
 
-    if rank_type == "in":
-        ranking = list(StockIn.objects.values('material_code', 'material_name').annotate(
-            total_qty=Sum('in_quantity')).order_by('-total_qty')[:limit])
-    else:
-        ranking = list(StockOut.objects.values('material_code', 'material_name').annotate(
-            total_qty=Sum('out_quantity')).order_by('-total_qty')[:limit])
+      if rank_type == "in":
+          ranking = list(StockIn.objects.values('material_code', 'material_name').annotate(
+              total_qty=Sum('in_quantity')).order_by('-total_qty')[:limit])
+      else:
+          ranking = list(StockOut.objects.values('material_code', 'material_name').annotate(
+              total_qty=Sum('out_quantity')).order_by('-total_qty')[:limit])
 
-    return _json_response(data={"list": ranking})
+      # 添加排名字段
+      for idx, item in enumerate(ranking, 1):
+          item['rank'] = idx
+
+      return _json_response(data={"list": ranking})
 
 
 @csrf_exempt

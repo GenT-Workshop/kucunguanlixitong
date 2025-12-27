@@ -1,9 +1,16 @@
 import json
+from functools import wraps
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST, require_GET, require_http_methods
 
 
 def _json_response(data=None, message="success", code=200):
@@ -22,24 +29,57 @@ def _json_error(message: str, code: int = 400):
 
 def _parse_json_body(request):
     """解析JSON请求体"""
-    content_type = request.content_type or ""
-    if "application/json" in content_type:
-        try:
-            return json.loads(request.body.decode("utf-8") or "{}")
-        except json.JSONDecodeError:
-            return None
-    return None
+    try:
+        return json.loads(request.body.decode("utf-8") or "{}")
+    except json.JSONDecodeError:
+        return None
+
+
+def login_required_json(view_func):
+    """登录验证装饰器"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return _json_error("请先登录", 401)
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def admin_required(view_func):
+    """管理员权限装饰器"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return _json_error("请先登录", 401)
+        if not request.user.is_staff:
+            return _json_error("您没有权限执行此操作", 403)
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def _serialize_user(user, detail=False):
+    """序列化用户对象"""
+    data = {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "is_staff": user.is_staff,
+    }
+    if detail:
+        data.update({
+            "is_active": user.is_active,
+            "date_joined": user.date_joined.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_login": user.last_login.strftime("%Y-%m-%dT%H:%M:%SZ") if user.last_login else None,
+        })
+    return data
 
 
 @csrf_exempt
+@require_POST
 def login_view(request):
     """用户登录"""
-    if request.method != "POST":
-        return _json_error("仅支持 POST 请求", 405)
-
     payload = _parse_json_body(request)
     if payload is None:
-        # 尝试从表单获取
         username = (request.POST.get("username") or "").strip()
         password = request.POST.get("password") or ""
     else:
@@ -54,23 +94,13 @@ def login_view(request):
         return _json_error("用户名或密码错误", 401)
 
     login(request, user)
-    return _json_response(
-        data={
-            "id": user.id,
-            "username": user.get_username(),
-            "email": user.email,
-            "is_staff": user.is_staff,
-        },
-        message="登录成功"
-    )
+    return _json_response(data=_serialize_user(user), message="登录成功")
 
 
 @csrf_exempt
+@require_POST
 def register_view(request):
     """用户注册"""
-    if request.method != "POST":
-        return _json_error("仅支持 POST 请求", 405)
-
     payload = _parse_json_body(request)
     if payload is None:
         return _json_error("请求体需要是 JSON", 400)
@@ -85,105 +115,64 @@ def register_view(request):
         return _json_error("邮箱不能为空", 400)
     if not password:
         return _json_error("密码不能为空", 400)
-    if len(password) < 8:
-        return _json_error("密码长度至少8位", 400)
 
-    # 检查用户名是否已存在
+    try:
+        validate_password(password)
+    except ValidationError as e:
+        return _json_error(e.messages[0], 400)
+
     if User.objects.filter(username=username).exists():
         return _json_error("用户名已存在", 400)
-
-    # 检查邮箱是否已存在
     if User.objects.filter(email=email).exists():
         return _json_error("邮箱已被注册", 400)
 
-    # 创建用户
-    user = User.objects.create_user(
-        username=username,
-        email=email,
-        password=password
-    )
-
-    return _json_response(
-        data={
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-        },
-        message="注册成功"
-    )
+    user = User.objects.create_user(username=username, email=email, password=password)
+    return _json_response(data=_serialize_user(user), message="注册成功")
 
 
 @csrf_exempt
+@require_POST
 def logout_view(request):
     """用户登出"""
-    if request.method != "POST":
-        return _json_error("仅支持 POST 请求", 405)
-
     logout(request)
     return _json_response(message="登出成功")
 
 
 @csrf_exempt
+@require_http_methods(["GET", "PUT"])
+@login_required_json
 def profile_view(request):
     """获取/更新用户信息"""
-    if not request.user.is_authenticated:
-        return _json_error("请先登录", 401)
+    user = request.user
 
     if request.method == "GET":
-        user = request.user
-        return _json_response(data={
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "is_staff": user.is_staff,
-            "date_joined": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
-            "last_login": user.last_login.strftime("%Y-%m-%d %H:%M:%S") if user.last_login else None,
-        })
+        return _json_response(data=_serialize_user(user, detail=True))
 
-    elif request.method == "PUT":
-        payload = _parse_json_body(request)
-        if payload is None:
-            return _json_error("请求体需要是 JSON", 400)
+    payload = _parse_json_body(request)
+    if payload is None:
+        return _json_error("请求体需要是 JSON", 400)
 
-        user = request.user
+    email = payload.get("email")
+    if email:
+        if User.objects.filter(email=email).exclude(id=user.id).exists():
+            return _json_error("邮箱已被使用", 400)
+        user.email = email
 
-        # 更新邮箱
-        email = payload.get("email")
-        if email:
-            if User.objects.filter(email=email).exclude(id=user.id).exists():
-                return _json_error("邮箱已被使用", 400)
-            user.email = email
+    username = payload.get("username")
+    if username:
+        if User.objects.filter(username=username).exclude(id=user.id).exists():
+            return _json_error("用户名已被使用", 400)
+        user.username = username
 
-        # 更新用户名
-        username = payload.get("username")
-        if username:
-            if User.objects.filter(username=username).exclude(id=user.id).exists():
-                return _json_error("用户名已被使用", 400)
-            user.username = username
-
-        user.save()
-
-        return _json_response(
-            data={
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-            },
-            message="更新成功"
-        )
-
-    return _json_error("不支持的请求方法", 405)
+    user.save()
+    return _json_response(data=_serialize_user(user), message="更新成功")
 
 
 @csrf_exempt
+@require_POST
+@login_required_json
 def change_password_view(request):
     """修改密码"""
-    if request.method != "POST":
-        return _json_error("仅支持 POST 请求", 405)
-
-    if not request.user.is_authenticated:
-        return _json_error("请先登录", 401)
-
     payload = _parse_json_body(request)
     if payload is None:
         return _json_error("请求体需要是 JSON", 400)
@@ -194,43 +183,28 @@ def change_password_view(request):
     if not old_password or not new_password:
         return _json_error("缺少旧密码或新密码", 400)
 
-    if len(new_password) < 8:
-        return _json_error("新密码长度至少8位", 400)
-
     user = request.user
     if not user.check_password(old_password):
         return _json_error("旧密码错误", 400)
 
+    try:
+        validate_password(new_password, user)
+    except ValidationError as e:
+        return _json_error(e.messages[0], 400)
+
     user.set_password(new_password)
     user.save()
-
+    update_session_auth_hash(request, user)
     return _json_response(message="密码修改成功")
 
 
 # ==================== 用户管理接口（管理员） ====================
 
-def _check_admin(request):
-    """检查是否为管理员"""
-    if not request.user.is_authenticated:
-        return False, _json_error("请先登录", 401)
-    if not request.user.is_staff:
-        return False, _json_error("您没有权限执行此操作", 403)
-    return True, None
-
-
 @csrf_exempt
+@require_GET
+@admin_required
 def user_list_view(request):
     """获取用户列表（管理员）"""
-    if request.method != "GET":
-        return _json_error("仅支持 GET 请求", 405)
-
-    is_admin, error = _check_admin(request)
-    if not is_admin:
-        return error
-
-    from django.core.paginator import Paginator
-    from django.db.models import Q
-
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))
     search = request.GET.get("search", "").strip()
@@ -239,81 +213,38 @@ def user_list_view(request):
 
     queryset = User.objects.all().order_by('-date_joined')
 
-    # 搜索
     if search:
-        queryset = queryset.filter(
-            Q(username__icontains=search) | Q(email__icontains=search)
-        )
-
-    # 角色筛选
+        queryset = queryset.filter(Q(username__icontains=search) | Q(email__icontains=search))
     if is_staff:
         queryset = queryset.filter(is_staff=(is_staff.lower() == 'true'))
-
-    # 状态筛选
     if is_active:
         queryset = queryset.filter(is_active=(is_active.lower() == 'true'))
 
-    # 分页
     paginator = Paginator(queryset, page_size)
     page_obj = paginator.get_page(page)
-
-    user_list = [
-        {
-            "id": u.id,
-            "username": u.username,
-            "email": u.email,
-            "is_staff": u.is_staff,
-            "is_active": u.is_active,
-            "date_joined": u.date_joined.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "last_login": u.last_login.strftime("%Y-%m-%dT%H:%M:%SZ") if u.last_login else None,
-        }
-        for u in page_obj
-    ]
 
     return _json_response(data={
         "total": paginator.count,
         "page": page,
         "page_size": page_size,
-        "list": user_list,
+        "list": [_serialize_user(u, detail=True) for u in page_obj],
     })
 
 
 @csrf_exempt
+@require_GET
+@admin_required
 def user_detail_view(request, pk):
     """获取用户详情（管理员）"""
-    if request.method != "GET":
-        return _json_error("仅支持 GET 请求", 405)
-
-    is_admin, error = _check_admin(request)
-    if not is_admin:
-        return error
-
-    try:
-        u = User.objects.get(pk=pk)
-    except User.DoesNotExist:
-        return _json_error("用户不存在", 404)
-
-    return _json_response(data={
-        "id": u.id,
-        "username": u.username,
-        "email": u.email,
-        "is_staff": u.is_staff,
-        "is_active": u.is_active,
-        "date_joined": u.date_joined.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "last_login": u.last_login.strftime("%Y-%m-%dT%H:%M:%SZ") if u.last_login else None,
-    })
+    u = get_object_or_404(User, pk=pk)
+    return _json_response(data=_serialize_user(u, detail=True))
 
 
 @csrf_exempt
+@require_POST
+@admin_required
 def user_create_view(request):
     """创建用户（管理员）"""
-    if request.method != "POST":
-        return _json_error("仅支持 POST 请求", 405)
-
-    is_admin, error = _check_admin(request)
-    if not is_admin:
-        return error
-
     payload = _parse_json_body(request)
     if payload is None:
         return _json_error("请求体需要是 JSON", 400)
@@ -328,60 +259,36 @@ def user_create_view(request):
         return _json_error("用户名不能为空", 400)
     if not email:
         return _json_error("邮箱不能为空", 400)
-    if not password or len(password) < 8:
-        return _json_error("密码长度至少8位", 400)
 
-    # 检查用户名是否已存在
+    try:
+        validate_password(password)
+    except ValidationError as e:
+        return _json_error(e.messages[0], 400)
+
     if User.objects.filter(username=username).exists():
         return _json_error("用户名已存在", 400)
-
-    # 检查邮箱是否已存在
     if User.objects.filter(email=email).exists():
         return _json_error("邮箱已被注册", 400)
 
-    # 创建用户
-    u = User.objects.create_user(
-        username=username,
-        email=email,
-        password=password
-    )
+    u = User.objects.create_user(username=username, email=email, password=password)
     u.is_staff = is_staff
     u.is_active = is_active
     u.save()
 
-    return _json_response(
-        data={
-            "id": u.id,
-            "username": u.username,
-            "email": u.email,
-            "is_staff": u.is_staff,
-            "is_active": u.is_active,
-            "date_joined": u.date_joined.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        },
-        message="用户创建成功"
-    )
+    return _json_response(data=_serialize_user(u, detail=True), message="用户创建成功")
 
 
 @csrf_exempt
+@require_http_methods(["PUT"])
+@admin_required
 def user_update_view(request, pk):
     """更新用户（管理员）"""
-    if request.method != "PUT":
-        return _json_error("仅支持 PUT 请求", 405)
-
-    is_admin, error = _check_admin(request)
-    if not is_admin:
-        return error
-
-    try:
-        u = User.objects.get(pk=pk)
-    except User.DoesNotExist:
-        return _json_error("用户不存在", 404)
+    u = get_object_or_404(User, pk=pk)
 
     payload = _parse_json_body(request)
     if payload is None:
         return _json_error("请求体需要是 JSON", 400)
 
-    # 更新用户名
     username = payload.get("username")
     if username:
         username = username.strip()
@@ -389,7 +296,6 @@ def user_update_view(request, pk):
             return _json_error("用户名已被使用", 400)
         u.username = username
 
-    # 更新邮箱
     email = payload.get("email")
     if email:
         email = email.strip()
@@ -397,44 +303,22 @@ def user_update_view(request, pk):
             return _json_error("邮箱已被使用", 400)
         u.email = email
 
-    # 更新角色
     if "is_staff" in payload:
         u.is_staff = payload["is_staff"]
-
-    # 更新状态
     if "is_active" in payload:
         u.is_active = payload["is_active"]
 
     u.save()
-
-    return _json_response(
-        data={
-            "id": u.id,
-            "username": u.username,
-            "email": u.email,
-            "is_staff": u.is_staff,
-            "is_active": u.is_active,
-        },
-        message="用户更新成功"
-    )
+    return _json_response(data=_serialize_user(u, detail=True), message="用户更新成功")
 
 
 @csrf_exempt
+@require_http_methods(["DELETE"])
+@admin_required
 def user_delete_view(request, pk):
     """删除用户（管理员）"""
-    if request.method != "DELETE":
-        return _json_error("仅支持 DELETE 请求", 405)
+    u = get_object_or_404(User, pk=pk)
 
-    is_admin, error = _check_admin(request)
-    if not is_admin:
-        return error
-
-    try:
-        u = User.objects.get(pk=pk)
-    except User.DoesNotExist:
-        return _json_error("用户不存在", 404)
-
-    # 不能删除自己
     if u.id == request.user.id:
         return _json_error("不能删除自己的账户", 400)
 
@@ -443,29 +327,23 @@ def user_delete_view(request, pk):
 
 
 @csrf_exempt
+@require_POST
+@admin_required
 def user_reset_password_view(request, pk):
     """重置用户密码（管理员）"""
-    if request.method != "POST":
-        return _json_error("仅支持 POST 请求", 405)
-
-    is_admin, error = _check_admin(request)
-    if not is_admin:
-        return error
-
-    try:
-        u = User.objects.get(pk=pk)
-    except User.DoesNotExist:
-        return _json_error("用户不存在", 404)
+    u = get_object_or_404(User, pk=pk)
 
     payload = _parse_json_body(request)
     if payload is None:
         return _json_error("请求体需要是 JSON", 400)
 
     new_password = payload.get("new_password") or ""
-    if len(new_password) < 8:
-        return _json_error("新密码长度至少8位", 400)
+
+    try:
+        validate_password(new_password, u)
+    except ValidationError as e:
+        return _json_error(e.messages[0], 400)
 
     u.set_password(new_password)
     u.save()
-
     return _json_response(message="密码重置成功")

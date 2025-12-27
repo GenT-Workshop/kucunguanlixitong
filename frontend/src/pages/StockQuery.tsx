@@ -44,7 +44,6 @@ const StockQuery = () => {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [stockStatusFilter, setStockStatusFilter] = useState<StockStatus | ''>('')
-  const [supplierFilter, setSupplierFilter] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
 
   // 详情弹窗
@@ -62,7 +61,6 @@ const StockQuery = () => {
         search: search || undefined,
         status: statusFilter || undefined,
         stock_status: stockStatusFilter || undefined,
-        supplier: supplierFilter || undefined,
         category: categoryFilter || undefined,
       })
       if (res.code === 200 && res.data) {
@@ -166,13 +164,6 @@ const StockQuery = () => {
       key: 'stock_value',
       width: 100,
       render: (val: string) => <span className={styles.valueCell}>¥{val}</span>,
-    },
-    {
-      title: '供应商',
-      dataIndex: 'supplier',
-      key: 'supplier',
-      width: 120,
-      render: (val: string) => val || '-',
     },
     {
       title: '状态',
@@ -287,14 +278,6 @@ const StockQuery = () => {
               <input
                 type="text"
                 className="cyber-input"
-                placeholder="供应商筛选"
-                value={supplierFilter}
-                onChange={(e) => setSupplierFilter(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <input
-                type="text"
-                className="cyber-input"
                 placeholder="类别筛选"
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
@@ -392,10 +375,6 @@ const StockQuery = () => {
               <div className={styles.detailItem}>
                 <span className={styles.detailLabel}>类别</span>
                 <span className={styles.detailValue}>{currentStock.category || '-'}</span>
-              </div>
-              <div className={styles.detailItem}>
-                <span className={styles.detailLabel}>供应商</span>
-                <span className={styles.detailValue}>{currentStock.supplier || '-'}</span>
               </div>
               <div className={styles.detailItem}>
                 <span className={styles.detailLabel}>当前库存</span>
