@@ -48,53 +48,39 @@ const Statistics = () => {
     try {
       const res = await getStatisticsTrend(trendDays)
       if (res.code === 200 && res.data) {
-        // 后端返回 {in_trend: [...], out_trend: [...]}，需要合并成前端需要的格式
-        const rawData = res.data as unknown as {
-          in_trend: { date: string; qty: number; value: string }[]
-          out_trend: { date: string; qty: number; value: string }[]
+        // 后端返回 {in_trend: [...], out_trend: [...]}，需要合并成 TrendDataItem[]
+        const { in_trend = [], out_trend = [] } = res.data as unknown as {
+          in_trend: Array<{ date: string; qty: number; value: string }>
+          out_trend: Array<{ date: string; qty: number; value: string }>
         }
 
-        // 收集所有日期
+        // 生成日期范围
         const dateMap = new Map<string, TrendDataItem>()
+        const end = new Date()
+        for (let i = trendDays - 1; i >= 0; i--) {
+          const d = new Date(end)
+          d.setDate(d.getDate() - i)
+          const dateStr = d.toISOString().split('T')[0]
+          dateMap.set(dateStr, { date: dateStr, in_qty: 0, out_qty: 0 })
+        }
 
-        // 处理入库数据
-        rawData.in_trend?.forEach(item => {
-          dateMap.set(item.date, {
-            date: item.date,
-            in_qty: item.qty || 0,
-            in_value: item.value || '0',
-            in_count: 0,
-            out_qty: 0,
-            out_value: '0',
-            out_count: 0,
-          })
-        })
-
-        // 处理出库数据
-        rawData.out_trend?.forEach(item => {
-          const existing = dateMap.get(item.date)
-          if (existing) {
-            existing.out_qty = item.qty || 0
-            existing.out_value = item.value || '0'
-          } else {
-            dateMap.set(item.date, {
-              date: item.date,
-              in_qty: 0,
-              in_value: '0',
-              in_count: 0,
-              out_qty: item.qty || 0,
-              out_value: item.value || '0',
-              out_count: 0,
-            })
+        // 填充入库数据
+        in_trend.forEach(item => {
+          const dateStr = typeof item.date === 'string' ? item.date.split('T')[0] : item.date
+          if (dateMap.has(dateStr)) {
+            dateMap.get(dateStr)!.in_qty = item.qty || 0
           }
         })
 
-        // 按日期排序
-        const mergedData = Array.from(dateMap.values()).sort((a, b) =>
-          a.date.localeCompare(b.date)
-        )
+        // 填充出库数据
+        out_trend.forEach(item => {
+          const dateStr = typeof item.date === 'string' ? item.date.split('T')[0] : item.date
+          if (dateMap.has(dateStr)) {
+            dateMap.get(dateStr)!.out_qty = item.qty || 0
+          }
+        })
 
-        setTrendData(mergedData)
+        setTrendData(Array.from(dateMap.values()))
       }
     } catch {
       console.error('获取趋势数据失败')
@@ -105,8 +91,14 @@ const Statistics = () => {
   const loadRanking = async () => {
     try {
       const res = await getStatisticsRanking({ type: rankingType, order_by: 'qty', days: 30, limit: 10 })
-      if (res.code === 200 && res.data && Array.isArray(res.data.list)) {
-        setRankingData(res.data.list)
+      if (res.code === 200 && res.data) {
+        // 添加排名字段
+        const list = (res.data.list || []).map((item: RankingItem, index: number) => ({
+          ...item,
+          rank: index + 1,
+          total_value: item.total_value || '0',
+        }))
+        setRankingData(list)
       }
     } catch {
       console.error('获取排行数据失败')

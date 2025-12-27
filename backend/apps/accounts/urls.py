@@ -12,6 +12,9 @@ from .views import (
     user_update_view,
     user_delete_view,
     user_reset_password_view,
+    role_list_view,
+    permission_list_view,
+    user_role_view,
 )
 
 urlpatterns = [
@@ -27,4 +30,8 @@ urlpatterns = [
     path("users/<int:pk>/update/", user_update_view, name="user_update"),
     path("users/<int:pk>/delete/", user_delete_view, name="user_delete"),
     path("users/<int:pk>/reset-password/", user_reset_password_view, name="user_reset_password"),
+    # 角色管理
+    path("roles/", role_list_view, name="role_list"),
+    path("permissions/", permission_list_view, name="permission_list"),
+    path("users/<int:pk>/roles/", user_role_view, name="user_role"),
 ]

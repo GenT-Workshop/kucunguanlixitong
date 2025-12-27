@@ -15,9 +15,11 @@ import {
   DeleteOutlined,
   LockOutlined,
   ExclamationCircleOutlined,
+  UserSwitchOutlined,
 } from '@ant-design/icons'
 import { useUser } from '../context/UserContext'
-import { getUserList, createUser, updateUser, deleteUser, resetUserPassword } from '../api/system'
+import { getUserList, createUser, updateUser, deleteUser, resetUserPassword, getRoleList, getUserRoles, setUserRoles } from '../api/system'
+import type { Role } from '../api/system'
 import type { SystemUser, UserCreateParams, UserUpdateParams } from '../api/types'
 import styles from './SystemManage.module.css'
 
@@ -50,13 +52,21 @@ const SystemManage = () => {
   const [resetPwdUser, setResetPwdUser] = useState<SystemUser | null>(null)
   const [newPassword, setNewPassword] = useState('')
 
+  // 角色分配弹窗
+  const [roleModalVisible, setRoleModalVisible] = useState(false)
+  const [roleModalUser, setRoleModalUser] = useState<SystemUser | null>(null)
+  const [allRoles, setAllRoles] = useState<Role[]>([])
+  const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([])
+
   // 检查登录状态和权限
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/login')
       return
     }
-    if (user?.role !== '管理员') {
+    // 检查是否有 user_manage 模块权限
+    const hasPermission = user?.role === '超级管理员' || user?.modules?.includes('user_manage')
+    if (!hasPermission) {
       message.error('您没有权限访问此页面')
       navigate('/dashboard')
       return
@@ -82,7 +92,8 @@ const SystemManage = () => {
   }
 
   useEffect(() => {
-    if (isLoggedIn && user?.role === '管理员') {
+    const hasPermission = user?.role === '超级管理员' || user?.modules?.includes('user_manage')
+    if (isLoggedIn && hasPermission) {
       loadUserList()
     }
   }, [pagination.page, pagination.pageSize, isLoggedIn, user])
@@ -220,6 +231,51 @@ const SystemManage = () => {
     }
   }
 
+  // 打开角色分配弹窗
+  const handleAssignRole = async (record: SystemUser) => {
+    setRoleModalUser(record)
+    setSubmitting(true)
+    try {
+      // 获取所有角色
+      const rolesRes = await getRoleList()
+      if (rolesRes.code === 200 && rolesRes.data) {
+        setAllRoles(rolesRes.data.list)
+      }
+      // 获取用户当前角色
+      const userRolesRes = await getUserRoles(record.id)
+      if (userRolesRes.code === 200 && userRolesRes.data) {
+        setSelectedRoleIds(userRolesRes.data.roles.map(r => r.id))
+      } else {
+        setSelectedRoleIds([])
+      }
+      setRoleModalVisible(true)
+    } catch {
+      message.error('获取角色信息失败')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // 提交角色分配
+  const handleSubmitRoles = async () => {
+    if (!roleModalUser) return
+    setSubmitting(true)
+    try {
+      const res = await setUserRoles(roleModalUser.id, selectedRoleIds)
+      if (res.code === 200) {
+        message.success('角色分配成功')
+        setRoleModalVisible(false)
+        loadUserList()
+      } else {
+        message.error(res.message || '分配失败')
+      }
+    } catch {
+      message.error('分配失败')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   // 用户表格列
   const userColumns = [
     {
@@ -292,6 +348,13 @@ const SystemManage = () => {
           </button>
           <button
             className={styles.actionBtn}
+            onClick={() => handleAssignRole(record)}
+            title="分配角色"
+          >
+            <UserSwitchOutlined />
+          </button>
+          <button
+            className={styles.actionBtn}
             onClick={() => handleResetPassword(record)}
             title="重置密码"
           >
@@ -309,7 +372,9 @@ const SystemManage = () => {
     },
   ]
 
-  if (!isLoggedIn || user?.role !== '管理员') {
+  const hasPermission = user?.role === '超级管理员' || user?.modules?.includes('user_manage')
+
+  if (!isLoggedIn || !hasPermission) {
     return (
       <div className={styles.loadingWrapper}>
         <Spin size="large" />
@@ -669,6 +734,70 @@ const SystemManage = () => {
               {submitting ? '提交中...' : '确定'}
             </button>
           </div>
+      </Modal>
+
+      {/* 角色分配弹窗 */}
+      <Modal
+        title="分配角色"
+        open={roleModalVisible}
+        onCancel={() => setRoleModalVisible(false)}
+        footer={null}
+        rootClassName="system-role-modal"
+        width={450}
+        centered
+      >
+        <style>{`
+          .system-role-modal .ant-modal-content {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border: 2px solid rgba(19, 194, 194, 0.6) !important;
+            border-radius: 12px !important;
+          }
+          .system-role-modal .ant-modal-header {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid rgba(19, 194, 194, 0.4) !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+          }
+          .system-role-modal .ant-modal-body {
+            background: rgba(0, 0, 0, 0.95) !important;
+            padding: 20px !important;
+          }
+          .system-role-modal .ant-modal-title {
+            color: #ffffff !important;
+          }
+          .system-role-modal .ant-modal-close {
+            color: #ffffff !important;
+          }
+        `}</style>
+        <p className={styles.modalDesc}>
+          为用户 <strong>{roleModalUser?.username}</strong> 分配角色
+        </p>
+        <div className={styles.roleList}>
+          {allRoles.map(role => (
+            <label key={role.id} className={styles.roleItem}>
+              <input
+                type="checkbox"
+                checked={selectedRoleIds.includes(role.id)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedRoleIds([...selectedRoleIds, role.id])
+                  } else {
+                    setSelectedRoleIds(selectedRoleIds.filter(id => id !== role.id))
+                  }
+                }}
+              />
+              <span className={styles.roleName}>{role.display_name}</span>
+            </label>
+          ))}
+        </div>
+        <div className={styles.modalActions}>
+          <button className="cyber-button-ghost" onClick={() => setRoleModalVisible(false)}>
+            取消
+          </button>
+          <button className="cyber-button" onClick={handleSubmitRoles} disabled={submitting}>
+            {submitting ? '提交中...' : '确定'}
+          </button>
+        </div>
       </Modal>
     </div>
   )

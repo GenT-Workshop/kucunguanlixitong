@@ -27,6 +27,7 @@ const MODULES = [
     color: '#4F8CFF',
     ready: true,
     description: '采购入库、生产入库、退货入库等',
+    module: 'stock_in',
   },
   {
     key: 'stock-out',
@@ -37,6 +38,7 @@ const MODULES = [
     color: '#52C41A',
     ready: true,
     description: '生产领料、销售提货、其他出库等',
+    module: 'stock_out',
   },
   {
     key: 'stock-query',
@@ -47,6 +49,7 @@ const MODULES = [
     color: '#722ED1',
     ready: true,
     description: '实时库存查询、多条件筛选',
+    module: 'stock_query',
   },
   {
     key: 'warning',
@@ -57,6 +60,7 @@ const MODULES = [
     color: '#FA8C16',
     ready: true,
     description: '低库存预警、高库存预警处理',
+    module: 'stock_warning',
   },
   {
     key: 'stock-count',
@@ -67,6 +71,7 @@ const MODULES = [
     color: '#13C2C2',
     ready: true,
     description: '盘点任务创建、盘点明细录入',
+    module: 'stock_count',
   },
   {
     key: 'statistics',
@@ -77,6 +82,7 @@ const MODULES = [
     color: '#EB2F96',
     ready: true,
     description: '出入库趋势、畅销滞销排行',
+    module: 'statistics',
   },
   {
     key: 'monthly-report',
@@ -87,6 +93,7 @@ const MODULES = [
     color: '#722ED1',
     ready: true,
     description: '月度报表、库存结存汇总',
+    module: 'monthly_report',
   },
   {
     key: 'system',
@@ -97,6 +104,7 @@ const MODULES = [
     color: '#13C2C2',
     ready: true,
     description: '用户管理、角色权限、系统配置',
+    module: 'user_manage',
   },
 ]
 
@@ -171,7 +179,12 @@ const Dashboard = () => {
           </div>
 
           <div className={styles.moduleGrid}>
-            {MODULES.map((module) => {
+            {MODULES.filter((module) => {
+              // 超级管理员可以看到所有模块
+              if (user?.role === '超级管理员') return true
+              // 根据用户的 modules 权限过滤
+              return user?.modules?.includes(module.module)
+            }).map((module) => {
               const IconComponent = module.icon
               return (
                 <div

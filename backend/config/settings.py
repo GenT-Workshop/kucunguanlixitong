@@ -59,9 +59,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "kucun_db",
-        "USER": "kucun_user",
-        "PASSWORD": "kucun123",
+        "NAME": "inventory_database",
+        "USER": "hzfa235h",
+        "PASSWORD": "Rxgt123456789",
         "HOST": "localhost",
         "PORT": "5432",
     }

@@ -12,6 +12,9 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 
+from .permissions import get_user_roles, get_user_modules, get_user_permissions
+from .models import Role, Permission, RolePermission, UserRole
+
 
 def _json_response(data=None, message="success", code=200):
     """统一响应格式"""
@@ -94,7 +97,25 @@ def login_view(request):
         return _json_error("用户名或密码错误", 401)
 
     login(request, user)
-    return _json_response(data=_serialize_user(user), message="登录成功")
+
+    # 获取用户角色和权限
+    roles = get_user_roles(user)
+    modules = get_user_modules(user)
+    permissions = list(get_user_permissions(user))
+
+    return _json_response(
+        data={
+            "id": user.id,
+            "username": user.get_username(),
+            "email": user.email,
+            "is_staff": user.is_staff,
+            "is_superuser": user.is_superuser,
+            "roles": [{"name": r.name, "display_name": r.display_name} for r in roles],
+            "modules": modules,
+            "permissions": permissions,
+        },
+        message="登录成功"
+    )
 
 
 @csrf_exempt
@@ -146,7 +167,22 @@ def profile_view(request):
     user = request.user
 
     if request.method == "GET":
-        return _json_response(data=_serialize_user(user, detail=True))
+        roles = get_user_roles(user)
+        modules = get_user_modules(user)
+        permissions = list(get_user_permissions(user))
+        return _json_response(data={
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "is_staff": user.is_staff,
+            "is_superuser": user.is_superuser,
+            "is_active": user.is_active,
+            "date_joined": user.date_joined.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_login": user.last_login.strftime("%Y-%m-%dT%H:%M:%SZ") if user.last_login else None,
+            "roles": [{"name": r.name, "display_name": r.display_name} for r in roles],
+            "modules": modules,
+            "permissions": permissions,
+        })
 
     payload = _parse_json_body(request)
     if payload is None:
@@ -347,3 +383,66 @@ def user_reset_password_view(request, pk):
     u.set_password(new_password)
     u.save()
     return _json_response(message="密码重置成功")
+
+
+# ==================== 角色管理接口 ====================
+
+@csrf_exempt
+@require_GET
+@admin_required
+def role_list_view(request):
+    """获取角色列表"""
+    roles = Role.objects.all()
+    role_list = [{
+        "id": r.id,
+        "name": r.name,
+        "display_name": r.display_name,
+        "description": r.description,
+        "is_active": r.is_active,
+    } for r in roles]
+
+    return _json_response(data={"list": role_list})
+
+
+@csrf_exempt
+@require_GET
+@admin_required
+def permission_list_view(request):
+    """获取权限列表"""
+    permissions = Permission.objects.all()
+    perm_list = [{
+        "id": p.id,
+        "code": p.code,
+        "name": p.name,
+        "module": p.module,
+    } for p in permissions]
+
+    return _json_response(data={"list": perm_list})
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+@admin_required
+def user_role_view(request, pk):
+    """获取/设置用户角色"""
+    u = get_object_or_404(User, pk=pk)
+
+    if request.method == "GET":
+        user_roles = UserRole.objects.filter(user=u).select_related('role')
+        roles = [{"id": ur.role.id, "name": ur.role.name, "display_name": ur.role.display_name} for ur in user_roles]
+        return _json_response(data={"roles": roles})
+
+    payload = _parse_json_body(request)
+    if payload is None:
+        return _json_error("请求体需要是 JSON", 400)
+
+    role_ids = payload.get("role_ids", [])
+    UserRole.objects.filter(user=u).delete()
+    for rid in role_ids:
+        try:
+            role = Role.objects.get(pk=rid)
+            UserRole.objects.create(user=u, role=role)
+        except Role.DoesNotExist:
+            pass
+
+    return _json_response(message="用户角色更新成功")

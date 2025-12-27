@@ -8,6 +8,8 @@ export interface User {
   avatar?: string
   joinDate: string
   lastLogin: string
+  modules?: string[]
+  permissions?: string[]
 }
 
 interface UserContextType {
@@ -50,9 +52,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           id: String(result.data.id),
           username: result.data.username,
           email: result.data.email,
-          role: result.data.is_staff ? '管理员' : '普通用户',
+          role: result.data.is_superuser ? '超级管理员' : (result.data.is_staff ? '管理员' : '普通用户'),
           joinDate: result.data.date_joined?.split(' ')[0] || '',
           lastLogin: result.data.last_login || '',
+          modules: result.data.modules || [],
+          permissions: result.data.permissions || [],
         }
         setUser(userData)
         localStorage.setItem(STORAGE_KEY, JSON.stringify(userData))
@@ -80,9 +84,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           id: String(result.data.id),
           username: result.data.username,
           email: result.data.email,
-          role: result.data.is_staff ? '管理员' : '普通用户',
+          role: result.data.is_superuser ? '超级管理员' : (result.data.is_staff ? '管理员' : '普通用户'),
           joinDate: new Date().toISOString().split('T')[0],
           lastLogin: new Date().toLocaleString('zh-CN'),
+          modules: result.data.modules || [],
+          permissions: result.data.permissions || [],
         }
         setUser(userData)
         localStorage.setItem(STORAGE_KEY, JSON.stringify(userData))
