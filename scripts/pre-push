@@ -1,0 +1,85 @@
+#!/bin/bash
+# pre-push hook - 推送前检查分支命名规范
+# 安装: 运行 scripts/install-git-hooks.sh 自动安装
+
+set -e
+
+current_branch=$(git symbolic-ref --short HEAD)
+
+echo "🔍 检查分支命名规范..."
+
+# 允许的分支命名格式
+# 1. 标准格式: feature/xxx, fix/xxx, refactor/xxx, test/xxx, docs/xxx, hotfix/xxx
+# 2. 保护分支: main, develop, production
+# 3. 历史遗留分支豁免: 产品树-我的工作分支, merge-infrastructure-improvements, public_patent_db 等
+
+# 检查是否为标准命名格式
+if echo "$current_branch" | grep -qE '^(feature|fix|refactor|test|docs|hotfix|release)/[a-z0-9-]+$'; then
+    echo "✅ 分支命名符合规范: $current_branch"
+    exit 0
+fi
+
+# 检查是否为保护分支
+if echo "$current_branch" | grep -qE '^(main|develop|production)$'; then
+    echo "✅ 保护分支: $current_branch"
+    exit 0
+fi
+
+# 历史遗留分支豁免列表
+legacy_branches="产品树-我的工作分支|产品树-我的工作分支-merge-fix|merge-infrastructure-improvements|public_patent_db|mornitor_process|producttree-merge-fixing|产品"
+
+if echo "$current_branch" | grep -qE "^($legacy_branches)$"; then
+    echo "⚠️  历史遗留分支（豁免）: $current_branch"
+    echo "   建议: 未来请使用标准命名格式"
+    exit 0
+fi
+
+# 检查是否为备份分支（允许但警告）
+if echo "$current_branch" | grep -qE '^backup-'; then
+    echo "⚠️  备份分支: $current_branch"
+    echo "   建议: 备份分支应及时清理"
+    exit 0
+fi
+
+# 不符合规范的分支
+echo ""
+echo "❌ 分支命名不符合规范: $current_branch"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "允许的分支命名格式："
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "  📌 标准格式："
+echo "     feature/xxx    - 新功能分支"
+echo "     fix/xxx        - Bug修复分支"
+echo "     refactor/xxx   - 重构分支"
+echo "     test/xxx       - 测试分支"
+echo "     docs/xxx       - 文档分支"
+echo "     hotfix/xxx     - 紧急修复分支"
+echo ""
+echo "  📌 保护分支："
+echo "     main           - 主开发分支"
+echo "     develop        - 开发集成分支"
+echo "     production     - 生产环境分支"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "示例："
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "  ✅ feature/product-tree-visualization"
+echo "  ✅ fix/migration-conflict"
+echo "  ✅ refactor/api-service"
+echo "  ✅ test/unit-tests"
+echo "  ✅ docs/readme-update"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "⚠️  如需继续推送，请重命名分支："
+echo ""
+echo "   git branch -m $current_branch feature/your-feature-name"
+echo ""
+echo "或跳过此检查（不推荐）："
+echo ""
+echo "   git push --no-verify"
+echo ""
+exit 1

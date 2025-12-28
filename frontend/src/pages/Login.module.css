@@ -4,19 +4,11 @@
   padding-top: 72px;
   position: relative;
   z-index: 1;
-}
-
-.leftSection {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  padding: var(--spacing-3xl);
-  padding-left: var(--spacing-3xl);
+  align-items: center;
 }
 
-.rightSection {
-  flex: 1;
+.centerSection {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,8 +24,8 @@
 
 .formCard {
   width: 100%;
-  max-width: 420px;
-  padding: var(--spacing-2xl);
+  max-width: 480px;
+  padding: var(--spacing-2xl) var(--spacing-3xl);
 }
 
 .formHeader {
@@ -188,19 +180,5 @@
 @media (max-width: 968px) {
   .main {
     flex-direction: column;
-  }
-
-  .leftSection {
-    padding: var(--spacing-xl);
-    text-align: center;
-    align-items: center;
-  }
-
-  .leftSection .hero-title {
-    font-size: var(--font-size-3xl);
-  }
-
-  .leftSection .hero-year {
-    font-size: var(--font-size-4xl);
   }
 }

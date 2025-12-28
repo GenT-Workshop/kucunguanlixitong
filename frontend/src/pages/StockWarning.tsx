@@ -176,12 +176,6 @@ const StockWarningPage = () => {
       <header className="nav-header">
         <div className="nav-left">
           <span className={styles.navTitle}>Stock Warning</span>
-          <button className="icon-button" onClick={() => message.info('收藏功能')}>
-            <StarOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('快捷操作')}>
-            <ThunderboltOutlined style={{ fontSize: 20 }} />
-          </button>
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
@@ -195,9 +189,8 @@ const StockWarningPage = () => {
         {/* 左侧标题区 */}
         <div className={styles.leftSection}>
           <h1 className="hero-title">
-            STOCK<br />WARNING
+            预警
           </h1>
-          <div className="hero-year">预警</div>
 
           {/* 统计卡片 */}
           {statistics && (

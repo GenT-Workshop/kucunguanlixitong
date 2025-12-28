@@ -114,15 +114,6 @@ const Register = () => {
       <header className="nav-header">
         <div className="nav-left">
           <span className={styles.navTitle}>Detail Page</span>
-          <button className="icon-button" onClick={() => message.info('收藏功能')}>
-            <StarOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('快捷操作')}>
-            <ThunderboltOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('截图功能')}>
-            <CameraOutlined style={{ fontSize: 20 }} />
-          </button>
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
@@ -135,9 +126,8 @@ const Register = () => {
         {/* 左侧标题区 */}
         <div className={styles.leftSection}>
           <h1 className="hero-title">
-            JOIN<br />US
+            注册
           </h1>
-          <div className="hero-year">2025</div>
 
           {/* 特性列表 */}
           <div className={styles.features}>

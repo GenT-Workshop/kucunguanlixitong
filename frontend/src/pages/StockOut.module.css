@@ -192,6 +192,22 @@
   background: rgba(255, 77, 79, 0.1);
 }
 
+/* 编辑按钮 */
+.editBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.editBtn:hover {
+  color: #4F8CFF;
+  background: rgba(79, 140, 255, 0.1);
+}
+
 /* 分页 */
 .pagination {
   display: flex;

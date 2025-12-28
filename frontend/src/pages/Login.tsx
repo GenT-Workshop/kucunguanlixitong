@@ -4,9 +4,6 @@ import { message, Spin } from 'antd'
 import {
   EyeOutlined,
   EyeInvisibleOutlined,
-  ThunderboltOutlined,
-  StarOutlined,
-  CameraOutlined,
   LoadingOutlined,
 } from '@ant-design/icons'
 import { useUser } from '../context/UserContext'
@@ -81,17 +78,8 @@ const Login = () => {
       <header className="nav-header">
         <div className="nav-left">
           <span className={styles.navTitle}>Detail Page</span>
-          <button className="icon-button" onClick={() => message.info('收藏功能')}>
-            <StarOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('快捷操作')}>
-            <ThunderboltOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('截图功能')}>
-            <CameraOutlined style={{ fontSize: 20 }} />
-          </button>
         </div>
-        <div className="nav-center">2025</div>
+        <div className="nav-center">库存管理系统</div>
         <div className="nav-right">
           <Link to="/login" className="nav-link">Home</Link>
         </div>
@@ -99,16 +87,8 @@ const Login = () => {
 
       {/* 主体内容 */}
       <main className={styles.main}>
-        {/* 左侧标题区 */}
-        <div className={styles.leftSection}>
-          <h1 className="hero-title">
-            WELCOME<br />BACK
-          </h1>
-          <div className="hero-year">2025</div>
-        </div>
-
-        {/* 右侧登录表单 */}
-        <div className={styles.rightSection}>
+        {/* 登录表单居中 */}
+        <div className={styles.centerSection}>
           <div className={`glass-card ${styles.formCard}`}>
             <div className={styles.formHeader}>
               <h2 className={styles.formTitle}>登录</h2>
@@ -204,8 +184,6 @@ const Login = () => {
         </div>
       </div>
       <div className="corner-info bottom-right">
-        <div className="brand-badge">System</div>
-        <p style={{ marginTop: 8 }}>用户认证系统<br />User Authentication</p>
       </div>
     </div>
   )

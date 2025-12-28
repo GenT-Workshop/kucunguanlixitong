@@ -211,12 +211,6 @@ const Statistics = () => {
       <header className="nav-header">
         <div className="nav-left">
           <span className={styles.navTitle}>Statistics</span>
-          <button className="icon-button" onClick={() => message.info('收藏功能')}>
-            <StarOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('快捷操作')}>
-            <ThunderboltOutlined style={{ fontSize: 20 }} />
-          </button>
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
@@ -230,9 +224,8 @@ const Statistics = () => {
         {/* 左侧标题区 */}
         <div className={styles.leftSection}>
           <h1 className="hero-title">
-            STOCK<br />STATS
+            统计
           </h1>
-          <div className="hero-year">统计</div>
         </div>
 
         {/* 右侧内容区 */}

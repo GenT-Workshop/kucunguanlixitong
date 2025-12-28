@@ -2,16 +2,9 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { message, Modal, Input } from 'antd'
 import {
-  ThunderboltOutlined,
-  StarOutlined,
-  CameraOutlined,
   UserOutlined,
-  SettingOutlined,
   LogoutOutlined,
   EditOutlined,
-  DatabaseOutlined,
-  CloudServerOutlined,
-  SafetyCertificateOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons'
 import { useUser } from '../context/UserContext'
@@ -28,13 +21,6 @@ const Profile = () => {
     navigate('/login')
     return null
   }
-
-  // 统计数据 - 库存管理相关
-  const stats = [
-    { label: '入库单', value: '-', icon: <DatabaseOutlined /> },
-    { label: '出库单', value: '-', icon: <CloudServerOutlined /> },
-    { label: '库存品类', value: '-', icon: <SafetyCertificateOutlined /> },
-  ]
 
   // 活动记录 - 库存管理相关
   const activities = [
@@ -88,16 +74,6 @@ const Profile = () => {
     }
   }
 
-  // 安全设置
-  const handleSecuritySettings = () => {
-    message.info('安全设置功能开发中...')
-  }
-
-  // 设置按钮
-  const handleSettings = () => {
-    message.info('系统设置功能开发中...')
-  }
-
   // 编辑头像
   const handleEditAvatar = () => {
     message.info('头像上传功能开发中...')
@@ -109,15 +85,6 @@ const Profile = () => {
       <header className="nav-header">
         <div className="nav-left">
           <span className={styles.navTitle}>Detail Page</span>
-          <button className="icon-button" onClick={() => message.info('收藏功能')}>
-            <StarOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('快捷操作')}>
-            <ThunderboltOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('截图功能')}>
-            <CameraOutlined style={{ fontSize: 20 }} />
-          </button>
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
@@ -130,9 +97,8 @@ const Profile = () => {
         {/* 左侧标题区 */}
         <div className={styles.leftSection}>
           <h1 className="hero-title">
-            YOUR<br />PROFILE
+            个人<br />资料
           </h1>
-          <div className="hero-year">2025</div>
         </div>
 
         {/* 右侧个人信息区 */}
@@ -158,28 +124,10 @@ const Profile = () => {
                 <span className={styles.roleBadge}>{user.role}</span>
               </div>
               <div className={styles.profileActions}>
-                <button className="icon-button" onClick={handleSettings}>
-                  <SettingOutlined style={{ fontSize: 20 }} />
-                </button>
                 <button className="icon-button" onClick={handleLogout}>
                   <LogoutOutlined style={{ fontSize: 20 }} />
                 </button>
               </div>
-            </div>
-
-            {/* 统计数据 */}
-            <div className={styles.statsGrid}>
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className={styles.statItem}
-                  onClick={() => message.info(`${stat.label}详情功能开发中...`)}
-                >
-                  <div className={styles.statIcon}>{stat.icon}</div>
-                  <div className={styles.statValue}>{stat.value}</div>
-                  <div className={styles.statLabel}>{stat.label}</div>
-                </div>
-              ))}
             </div>
 
             {/* 账户信息 */}
@@ -216,7 +164,6 @@ const Profile = () => {
             {/* 操作按钮 */}
             <div className={styles.buttonGroup}>
               <button className="cyber-button" onClick={handleEditProfile}>编辑资料</button>
-              <button className="cyber-button-ghost" onClick={handleSecuritySettings}>安全设置</button>
             </div>
           </div>
         </div>

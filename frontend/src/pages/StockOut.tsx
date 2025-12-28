@@ -9,9 +9,10 @@ import {
   SearchOutlined,
   PlusOutlined,
   DeleteOutlined,
+  EditOutlined,
   ReloadOutlined,
 } from '@ant-design/icons'
-import { getStockOutList, createStockOut, deleteStockOut, getStockList } from '../api/stock'
+import { getStockOutList, createStockOut, deleteStockOut, updateStockOut, getStockList } from '../api/stock'
 import type { StockOut, Stock, StockOutType } from '../api/types'
 import { useAutoRefresh } from '../hooks/useAutoRefresh'
 import styles from './StockOut.module.css'
@@ -44,6 +45,7 @@ const StockOutPage = () => {
   // 新建出库弹窗
   const [modalVisible, setModalVisible] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
+  const [editingRecord, setEditingRecord] = useState<StockOut | null>(null)
   const [stockList, setStockList] = useState<Stock[]>([])
   const [formData, setFormData] = useState({
     material_code: '',
@@ -94,8 +96,8 @@ const StockOutPage = () => {
     loadStockOutList()
   }, [page, outTypeFilter, loadStockOutList])
 
-  // 自动刷新数据（每2秒）
-  useAutoRefresh(loadStockOutList, { interval: 2000 })
+  // 自动刷新数据（已禁用，如需启用可取消注释）
+  // useAutoRefresh(loadStockOutList, { interval: 2000 })
 
   useEffect(() => {
     loadStockList()
@@ -109,6 +111,7 @@ const StockOutPage = () => {
 
   // 打开新建弹窗
   const handleOpenModal = () => {
+    setEditingRecord(null)
     setFormData({
       material_code: '',
       out_quantity: '',
@@ -121,9 +124,27 @@ const StockOutPage = () => {
     setModalVisible(true)
   }
 
-  // 提交出库
+  // 打开编辑弹窗
+  const handleOpenEditModal = (record: StockOut) => {
+    setEditingRecord(record)
+    const unitPrice = record.out_quantity > 0
+      ? (Number(record.out_value) / record.out_quantity).toFixed(2)
+      : ''
+    setFormData({
+      material_code: record.material_code,
+      out_quantity: String(record.out_quantity),
+      unit_price: unitPrice,
+      out_value: record.out_value,
+      out_type: record.out_type,
+      operator: record.operator || '',
+      remark: '',
+    })
+    setModalVisible(true)
+  }
+
+  // 提交出库（新增或编辑）
   const handleSubmit = async () => {
-    if (!formData.material_code) {
+    if (!editingRecord && !formData.material_code) {
       message.error('请选择物料')
       return
     }
@@ -136,21 +157,31 @@ const StockOutPage = () => {
       return
     }
 
-    // 计算出库价值 = 数量 * 单价
     const calculatedValue = Number(formData.out_quantity) * Number(formData.unit_price)
 
     setModalLoading(true)
     try {
-      const res = await createStockOut({
-        material_code: formData.material_code,
-        out_quantity: Number(formData.out_quantity),
-        out_value: calculatedValue,
-        out_type: formData.out_type,
-        operator: formData.operator || undefined,
-        remark: formData.remark || undefined,
-      })
+      let res
+      if (editingRecord) {
+        res = await updateStockOut(editingRecord.id, {
+          out_quantity: Number(formData.out_quantity),
+          out_value: calculatedValue,
+          out_type: formData.out_type,
+          operator: formData.operator || undefined,
+          remark: formData.remark || undefined,
+        })
+      } else {
+        res = await createStockOut({
+          material_code: formData.material_code,
+          out_quantity: Number(formData.out_quantity),
+          out_value: calculatedValue,
+          out_type: formData.out_type,
+          operator: formData.operator || undefined,
+          remark: formData.remark || undefined,
+        })
+      }
       if (res.code === 200) {
-        message.success(res.message)
+        message.success(res.message || (editingRecord ? '更新成功' : '出库成功'))
         setModalVisible(false)
         loadStockOutList()
         loadStockList()
@@ -158,7 +189,7 @@ const StockOutPage = () => {
         message.error(res.message)
       }
     } catch {
-      message.error('出库失败')
+      message.error(editingRecord ? '更新失败' : '出库失败')
     } finally {
       setModalLoading(false)
     }
@@ -200,15 +231,6 @@ const StockOutPage = () => {
       <header className="nav-header">
         <div className="nav-left">
           <span className={styles.navTitle}>Stock Out</span>
-          <button className="icon-button" onClick={() => message.info('收藏功能')}>
-            <StarOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('快捷操作')}>
-            <ThunderboltOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('截图功能')}>
-            <CameraOutlined style={{ fontSize: 20 }} />
-          </button>
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
@@ -222,9 +244,8 @@ const StockOutPage = () => {
         {/* 左侧标题区 */}
         <div className={styles.leftSection}>
           <h1 className="hero-title">
-            STOCK<br />OUT
+            出库
           </h1>
-          <div className={styles.heroSubtitle}>出库</div>
         </div>
 
         {/* 右侧内容区 */}
@@ -311,13 +332,22 @@ const StockOutPage = () => {
                           <td>{item.operator || '-'}</td>
                           <td>{new Date(item.out_time).toLocaleString('zh-CN')}</td>
                           <td>
-                            <button
-                              className={styles.deleteBtn}
-                              onClick={() => handleDelete(item)}
-                              title="撤销出库"
-                            >
-                              <DeleteOutlined />
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                className={styles.editBtn}
+                                onClick={() => handleOpenEditModal(item)}
+                                title="编辑"
+                              >
+                                <EditOutlined />
+                              </button>
+                              <button
+                                className={styles.deleteBtn}
+                                onClick={() => handleDelete(item)}
+                                title="撤销出库"
+                              >
+                                <DeleteOutlined />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -352,9 +382,9 @@ const StockOutPage = () => {
         </div>
       </main>
 
-      {/* 新建出库弹窗 */}
+      {/* 新建/编辑出库弹窗 */}
       <Modal
-        title="新建出库"
+        title={editingRecord ? '编辑出库' : '新建出库'}
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
@@ -410,17 +440,26 @@ const StockOutPage = () => {
         <div className={styles.modalForm}>
           <div className={styles.formGroup}>
             <label>物料 *</label>
-            <select
-              value={formData.material_code}
-              onChange={(e) => handleMaterialChange(e.target.value)}
-            >
-              <option value="">请选择物料</option>
-              {stockList.map((stock) => (
-                <option key={stock.id} value={stock.material_code}>
-                  {stock.material_code} - {stock.material_name} (库存: {stock.current_stock})
-                </option>
-              ))}
-            </select>
+            {editingRecord ? (
+              <input
+                type="text"
+                className="cyber-input"
+                value={`${editingRecord.material_code} - ${editingRecord.material_name}`}
+                disabled
+              />
+            ) : (
+              <select
+                value={formData.material_code}
+                onChange={(e) => handleMaterialChange(e.target.value)}
+              >
+                <option value="">请选择物料</option>
+                {stockList.map((stock) => (
+                  <option key={stock.id} value={stock.material_code}>
+                    {stock.material_code} - {stock.material_name} (库存: {stock.current_stock})
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
@@ -507,7 +546,7 @@ const StockOutPage = () => {
               onClick={handleSubmit}
               disabled={modalLoading}
             >
-              {modalLoading ? <Spin indicator={<LoadingOutlined />} /> : '确认出库'}
+              {modalLoading ? <Spin indicator={<LoadingOutlined />} /> : (editingRecord ? '确认修改' : '确认出库')}
             </button>
           </div>
         </div>

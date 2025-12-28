@@ -132,3 +132,10 @@ coverage/
 *.pid
 *.seed
 *.pid.lock
+
+# ==================== Project Specific ====================
+# Database backups
+backups/
+
+# Temporary screenshots
+图片/

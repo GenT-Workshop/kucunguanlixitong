@@ -10,9 +10,10 @@ import {
   LoadingOutlined,
   InboxOutlined,
   DeleteOutlined,
+  EditOutlined,
   AppstoreAddOutlined,
 } from '@ant-design/icons'
-import { createStockIn, getStockInList, getStockList, deleteStockIn, stockInit } from '../api/stock'
+import { createStockIn, getStockInList, getStockList, deleteStockIn, updateStockIn, stockInit } from '../api/stock'
 import type { StockIn as StockInType, Stock, StockInType as InType } from '../api/types'
 import { useAutoRefresh } from '../hooks/useAutoRefresh'
 import styles from './StockIn.module.css'
@@ -46,6 +47,7 @@ const StockIn = () => {
   const [search, setSearch] = useState('')
   const [inTypeFilter, setInTypeFilter] = useState<InType | ''>('')
   const [modalVisible, setModalVisible] = useState(false)
+  const [editingRecord, setEditingRecord] = useState<StockInType | null>(null)
 
   // 新增物料弹窗状态
   const [materialModalVisible, setMaterialModalVisible] = useState(false)
@@ -175,6 +177,7 @@ const StockIn = () => {
 
   // 打开新增入库弹窗
   const openModal = () => {
+    setEditingRecord(null)
     setFormData({
       material_code: '',
       in_quantity: '',
@@ -189,9 +192,29 @@ const StockIn = () => {
     setModalVisible(true)
   }
 
-  // 提交入库
+  // 打开编辑入库弹窗
+  const openEditModal = (record: StockInType) => {
+    setEditingRecord(record)
+    const unitPrice = record.in_quantity > 0
+      ? (Number(record.in_value) / record.in_quantity).toFixed(2)
+      : ''
+    setFormData({
+      material_code: record.material_code,
+      in_quantity: String(record.in_quantity),
+      unit_price: unitPrice,
+      in_value: record.in_value,
+      in_time: '',
+      in_type: record.in_type,
+      supplier: record.supplier || '',
+      operator: record.operator || '',
+      remark: '',
+    })
+    setModalVisible(true)
+  }
+
+  // 提交入库（新增或编辑）
   const handleSubmit = async () => {
-    if (!formData.material_code) {
+    if (!editingRecord && !formData.material_code) {
       message.error('请选择物料')
       return
     }
@@ -204,31 +227,44 @@ const StockIn = () => {
       return
     }
 
-    // 计算入库价值 = 数量 * 单价
     const calculatedValue = Number(formData.in_quantity) * Number(formData.unit_price)
 
     setLoading(true)
     try {
-      const res = await createStockIn({
-        material_code: formData.material_code,
-        in_quantity: Number(formData.in_quantity),
-        in_value: calculatedValue,
-        in_type: formData.in_type,
-        in_time: formData.in_time || undefined,
-        supplier: formData.supplier || undefined,
-        operator: formData.operator || undefined,
-        remark: formData.remark || undefined,
-      })
+      let res
+      if (editingRecord) {
+        // 编辑模式
+        res = await updateStockIn(editingRecord.id, {
+          in_quantity: Number(formData.in_quantity),
+          in_value: calculatedValue,
+          in_type: formData.in_type,
+          supplier: formData.supplier || undefined,
+          operator: formData.operator || undefined,
+          remark: formData.remark || undefined,
+        })
+      } else {
+        // 新增模式
+        res = await createStockIn({
+          material_code: formData.material_code,
+          in_quantity: Number(formData.in_quantity),
+          in_value: calculatedValue,
+          in_type: formData.in_type,
+          in_time: formData.in_time || undefined,
+          supplier: formData.supplier || undefined,
+          operator: formData.operator || undefined,
+          remark: formData.remark || undefined,
+        })
+      }
       if (res.code === 200) {
-        message.success(res.message || '入库成功')
+        message.success(res.message || (editingRecord ? '更新成功' : '入库成功'))
         setModalVisible(false)
         loadStockInList()
         loadStockList()
       } else {
-        message.error(res.message || '入库失败')
+        message.error(res.message || (editingRecord ? '更新失败' : '入库失败'))
       }
     } catch {
-      message.error('入库失败，请稍后重试')
+      message.error(editingRecord ? '更新失败，请稍后重试' : '入库失败，请稍后重试')
     } finally {
       setLoading(false)
     }
@@ -337,15 +373,24 @@ const StockIn = () => {
     {
       title: '操作',
       key: 'action',
-      width: 80,
+      width: 100,
       render: (_: unknown, record: StockInType) => (
-        <button
-          className={styles.deleteBtn}
-          onClick={() => handleDelete(record)}
-          title="撤销入库"
-        >
-          <DeleteOutlined />
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            className={styles.editBtn}
+            onClick={() => openEditModal(record)}
+            title="编辑"
+          >
+            <EditOutlined />
+          </button>
+          <button
+            className={styles.deleteBtn}
+            onClick={() => handleDelete(record)}
+            title="撤销入库"
+          >
+            <DeleteOutlined />
+          </button>
+        </div>
       ),
     },
   ]
@@ -356,12 +401,6 @@ const StockIn = () => {
       <header className="nav-header">
         <div className="nav-left">
           <span className={styles.navTitle}>Stock In</span>
-          <button className="icon-button" onClick={() => message.info('收藏功能')}>
-            <StarOutlined style={{ fontSize: 20 }} />
-          </button>
-          <button className="icon-button" onClick={() => message.info('快捷操作')}>
-            <ThunderboltOutlined style={{ fontSize: 20 }} />
-          </button>
         </div>
         <div className="nav-center">2025</div>
         <div className="nav-right">
@@ -375,9 +414,8 @@ const StockIn = () => {
         {/* 左侧标题区 */}
         <div className={styles.leftSection}>
           <h1 className="hero-title">
-            STOCK<br />IN
+            入库
           </h1>
-          <div className="hero-year">入库</div>
         </div>
 
         {/* 右侧内容区 */}
@@ -449,9 +487,9 @@ const StockIn = () => {
         </div>
       </main>
 
-      {/* 新增入库弹窗 */}
+      {/* 新增/编辑入库弹窗 */}
       <Modal
-        title="新增入库"
+        title={editingRecord ? '编辑入库' : '新增入库'}
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
@@ -494,19 +532,28 @@ const StockIn = () => {
         <div className={styles.form}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>物料编号 *</label>
-              <select
-                className="cyber-input"
-                value={formData.material_code}
-                onChange={(e) => setFormData({ ...formData, material_code: e.target.value })}
-                disabled={loading}
-              >
-                <option value="">请选择物料</option>
-                {stockList.map((stock) => (
-                  <option key={stock.id} value={stock.material_code}>
-                    {stock.material_code} - {stock.material_name} (库存: {stock.current_stock})
-                  </option>
-                ))}
-              </select>
+              {editingRecord ? (
+                <input
+                  type="text"
+                  className="cyber-input"
+                  value={`${editingRecord.material_code} - ${editingRecord.material_name}`}
+                  disabled
+                />
+              ) : (
+                <select
+                  className="cyber-input"
+                  value={formData.material_code}
+                  onChange={(e) => setFormData({ ...formData, material_code: e.target.value })}
+                  disabled={loading}
+                >
+                  <option value="">请选择物料</option>
+                  {stockList.map((stock) => (
+                    <option key={stock.id} value={stock.material_code}>
+                      {stock.material_code} - {stock.material_name} (库存: {stock.current_stock})
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div className={styles.inputRow}>
@@ -632,7 +679,7 @@ const StockIn = () => {
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading ? <Spin indicator={<LoadingOutlined style={{ color: '#fff' }} />} /> : '确认入库'}
+                {loading ? <Spin indicator={<LoadingOutlined style={{ color: '#fff' }} />} /> : (editingRecord ? '确认修改' : '确认入库')}
               </button>
             </div>
           </div>

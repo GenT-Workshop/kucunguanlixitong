@@ -299,6 +299,70 @@ def stock_in_detail_view(request, pk):
 
 
 @csrf_exempt
+@require_http_methods(["PUT"])
+@require_permission('stock_in:update')
+def stock_in_update_view(request, pk):
+    """编辑入库记录"""
+    payload = _parse_json_body(request)
+    if payload is None:
+        return _json_error("请求体需要是 JSON", 400)
+
+    stock_in = get_object_or_404(StockIn, pk=pk)
+    old_quantity = stock_in.in_quantity
+    old_value = stock_in.in_value
+
+    # 获取更新字段
+    new_quantity = payload.get("in_quantity")
+    new_value = payload.get("in_value")
+    in_type = payload.get("in_type")
+    operator = payload.get("operator")
+    remark = payload.get("remark")
+    supplier = payload.get("supplier")
+
+    # 计算库存差异
+    quantity_diff = 0
+    value_diff = Decimal('0')
+
+    if new_quantity is not None and new_quantity != old_quantity:
+        if new_quantity <= 0:
+            return _json_error("入库数量必须大于0", 400)
+        quantity_diff = new_quantity - old_quantity
+        stock_in.in_quantity = new_quantity
+
+    if new_value is not None:
+        new_value_decimal = Decimal(str(new_value))
+        value_diff = new_value_decimal - old_value
+        stock_in.in_value = new_value_decimal
+
+    if in_type is not None:
+        stock_in.in_type = in_type
+    if operator is not None:
+        stock_in.operator = operator
+    if remark is not None:
+        stock_in.remark = remark
+    if supplier is not None:
+        stock_in.supplier = supplier
+
+    # 检查库存是否足够（如果减少数量）
+    stock = stock_in.stock
+    if quantity_diff < 0 and stock.current_stock + quantity_diff < 0:
+        return _json_error("修改后库存将变为负数", 400)
+
+    with transaction.atomic():
+        stock_in.save()
+        if quantity_diff != 0 or value_diff != 0:
+            Stock.objects.filter(pk=stock.pk).update(
+                current_stock=F('current_stock') + quantity_diff,
+                stock_value=F('stock_value') + value_diff,
+            )
+
+    return _json_response(
+        data={"id": stock_in.id, "bill_no": stock_in.bill_no},
+        message="入库记录更新成功"
+    )
+
+
+@csrf_exempt
 @require_http_methods(["DELETE"])
 @require_permission('stock_in:delete')
 def stock_in_delete_view(request, pk):
@@ -446,6 +510,64 @@ def stock_out_detail_view(request, pk):
         "operator": stock_out.operator, "remark": stock_out.remark,
         "created_at": stock_out.created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
     })
+
+
+@csrf_exempt
+@require_http_methods(["PUT"])
+@require_permission('stock_out:update')
+def stock_out_update_view(request, pk):
+    """编辑出库记录"""
+    payload = _parse_json_body(request)
+    if payload is None:
+        return _json_error("请求体需要是 JSON", 400)
+
+    stock_out = get_object_or_404(StockOut, pk=pk)
+    old_quantity = stock_out.out_quantity
+    old_value = stock_out.out_value
+
+    new_quantity = payload.get("out_quantity")
+    new_value = payload.get("out_value")
+    out_type = payload.get("out_type")
+    operator = payload.get("operator")
+    remark = payload.get("remark")
+
+    quantity_diff = 0
+    value_diff = Decimal('0')
+
+    if new_quantity is not None and new_quantity != old_quantity:
+        if new_quantity <= 0:
+            return _json_error("出库数量必须大于0", 400)
+        quantity_diff = new_quantity - old_quantity
+        stock_out.out_quantity = new_quantity
+
+    if new_value is not None:
+        new_value_decimal = Decimal(str(new_value))
+        value_diff = new_value_decimal - old_value
+        stock_out.out_value = new_value_decimal
+
+    if out_type is not None:
+        stock_out.out_type = out_type
+    if operator is not None:
+        stock_out.operator = operator
+    if remark is not None:
+        stock_out.remark = remark
+
+    stock = stock_out.stock
+    if quantity_diff > 0 and stock.current_stock < quantity_diff:
+        return _json_error("库存不足，无法增加出库数量", 400)
+
+    with transaction.atomic():
+        stock_out.save()
+        if quantity_diff != 0 or value_diff != 0:
+            Stock.objects.filter(pk=stock.pk).update(
+                current_stock=F('current_stock') - quantity_diff,
+                stock_value=F('stock_value') - value_diff,
+            )
+
+    return _json_response(
+        data={"id": stock_out.id, "bill_no": stock_out.bill_no},
+        message="出库记录更新成功"
+    )
 
 
 @csrf_exempt

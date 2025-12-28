@@ -243,6 +243,25 @@
   border-color: #ef4444;
 }
 
+/* 编辑按钮 */
+.editBtn {
+  background: transparent;
+  border: 1px solid rgba(79, 140, 255, 0.5);
+  color: #4F8CFF;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editBtn:hover {
+  background: rgba(79, 140, 255, 0.1);
+  border-color: #4F8CFF;
+}
+
 /* 弹窗样式 */
 .modal :global(.ant-modal-mask) {
   background: transparent !important;

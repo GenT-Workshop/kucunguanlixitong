@@ -162,9 +162,8 @@ const Dashboard = () => {
         {/* 左侧标题区 */}
         <div className={styles.leftSection}>
           <h1 className="hero-title">
-            INVENTORY<br />SYSTEM
+            库存<br />管理系统
           </h1>
-          <div className="hero-year">2025</div>
         </div>
 
         {/* 右侧功能模块区 */}

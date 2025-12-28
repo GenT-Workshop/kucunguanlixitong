@@ -1,0 +1,67 @@
+#!/bin/bash
+# Git post-merge hook - 拉取代码后自动处理
+# 安装方法: cp scripts/post-merge .git/hooks/ && chmod +x .git/hooks/post-merge
+
+set -e
+
+echo "🔄 检测到代码更新，自动处理依赖和迁移..."
+
+# 检查是否在Docker环境中
+if [ -f /.dockerenv ]; then
+    IN_DOCKER=true
+else
+    IN_DOCKER=false
+fi
+
+# 检查迁移文件是否有变化
+MIGRATION_CHANGED=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep "migrations/" || true)
+
+if [ ! -z "$MIGRATION_CHANGED" ]; then
+    echo "📝 检测到迁移文件变化"
+
+    # 🔧 新增：检测迁移冲突
+    if [ "$IN_DOCKER" = true ]; then
+        CONFLICT_CHECK=$(python manage.py showmigrations --plan 2>&1 | grep -E "\\[X\\].*\\[X\\]" || true)
+    else
+        CONFLICT_CHECK=$(docker compose exec -T backend python manage.py showmigrations --plan 2>&1 | grep -E "\\[X\\].*\\[X\\]" || true)
+    fi
+
+    if [ ! -z "$CONFLICT_CHECK" ]; then
+        echo "⚠️  检测到迁移序号冲突！正在自动解决..."
+
+        if [ "$IN_DOCKER" = true ]; then
+            # 在Docker内部 - 自动合并冲突的迁移
+            python manage.py makemigrations --merge --noinput
+        else
+            # 在主机上
+            docker compose exec -T backend python manage.py makemigrations --merge --noinput
+        fi
+
+        echo "✅ 迁移冲突已自动合并"
+    fi
+
+    # 应用迁移
+    if [ "$IN_DOCKER" = true ]; then
+        # 在Docker内部
+        python manage.py migrate --noinput
+    else
+        # 在主机上
+        docker compose exec -T backend python manage.py migrate --noinput || {
+            echo "⚠️  迁移失败，可能需要手动处理"
+            echo "建议运行: docker compose exec backend bash scripts/fix_migrations.sh"
+        }
+    fi
+fi
+
+# 检查package.json是否有变化
+PACKAGE_CHANGED=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep "package.json" || true)
+
+if [ ! -z "$PACKAGE_CHANGED" ]; then
+    echo "📦 检测到依赖变化"
+
+    if [ -d "frontend" ] && echo "$PACKAGE_CHANGED" | grep -q "frontend/package.json"; then
+        cd frontend && npm install && cd ..
+    fi
+fi
+
+echo "✅ 自动处理完成!"
