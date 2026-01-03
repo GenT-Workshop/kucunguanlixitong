@@ -23,15 +23,14 @@ backend/
 ├── apps/
 │   ├── accounts/          # 用户认证与权限
 │   │   ├── models.py      # Role, Permission, UserRole, RolePermission
-│   │   ├── views.py       # 登录/注册/用户管理
+│   │   ├── views.py       # 登录、注册、用户管理
 │   │   ├── urls.py        # 认证相关路由
 │   │   └── permissions.py # 权限检查装饰器
 │   └── stock/             # 库存管理核心
 │       ├── models.py      # Stock, StockIn, StockOut, StockWarning, StockCountTask
-│       ├── views.py       # 库存/入库/出库/预警/盘点/统计
+│       ├── views.py       # 库存、入库、出库、预警/盘点/统计
 │       └── urls.py        # 库存相关路由
 ├── manage.py
-├── init_data.py           # 初始化测试数据
 └── requirements.txt
 ```
 
@@ -47,9 +46,6 @@ python manage.py migrate
 
 # 初始化权限和角色
 python manage.py init_permissions
-
-# 初始化测试数据
-python init_data.py
 ```
 
 ## 数据库配置
@@ -141,7 +137,7 @@ DATABASES = {
 ### 统计分析
 - `GET /api/statistics/overview/` - 统计概览
 - `GET /api/statistics/trend/` - 出入库趋势
-- `GET /api/statistics/ranking/` - 物料排名
+- `GET /api/statistics/ranking/` - 物料排行
 - `GET /api/statistics/category/` - 分类统计
 
 ### 月底结存

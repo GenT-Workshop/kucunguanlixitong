@@ -4,10 +4,6 @@ import { message, Spin } from 'antd'
 import {
   EyeOutlined,
   EyeInvisibleOutlined,
-  ThunderboltOutlined,
-  StarOutlined,
-  CameraOutlined,
-  CheckCircleFilled,
   LoadingOutlined,
 } from '@ant-design/icons'
 import { useUser } from '../context/UserContext'
@@ -123,31 +119,8 @@ const Register = () => {
 
       {/* 主体内容 */}
       <main className={styles.main}>
-        {/* 左侧标题区 */}
-        <div className={styles.leftSection}>
-          <h1 className="hero-title">
-            注册
-          </h1>
-
-          {/* 特性列表 */}
-          <div className={styles.features}>
-            <div className={styles.featureItem}>
-              <CheckCircleFilled className={styles.featureIcon} />
-              <span>安全加密存储</span>
-            </div>
-            <div className={styles.featureItem}>
-              <CheckCircleFilled className={styles.featureIcon} />
-              <span>多端数据同步</span>
-            </div>
-            <div className={styles.featureItem}>
-              <CheckCircleFilled className={styles.featureIcon} />
-              <span>专业技术支持</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 右侧注册表单 */}
-        <div className={styles.rightSection}>
+        {/* 注册表单居中 */}
+        <div className={styles.centerSection}>
           <div className={`glass-card ${styles.formCard}`}>
             <div className={styles.formHeader}>
               <h2 className={styles.formTitle}>创建账户</h2>

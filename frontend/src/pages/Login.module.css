@@ -24,8 +24,8 @@
 
 .formCard {
   width: 100%;
-  max-width: 480px;
-  padding: var(--spacing-2xl) var(--spacing-3xl);
+  max-width: 420px;
+  padding: var(--spacing-2xl);
 }
 
 .formHeader {

@@ -63,15 +63,6 @@ const Login = () => {
     }
   }
 
-  const handleThirdPartyLogin = () => {
-    message.info('第三方登录功能开发中...')
-  }
-
-  const handleForgotPassword = (e: React.MouseEvent) => {
-    e.preventDefault()
-    message.info('密码重置功能开发中...')
-  }
-
   return (
     <div className="page-container">
       {/* 导航栏 */}
@@ -138,9 +129,6 @@ const Login = () => {
                   />
                   <span>记住我</span>
                 </label>
-                <a href="#" onClick={handleForgotPassword} className="cyber-link">
-                  忘记密码？
-                </a>
               </div>
 
               <button
@@ -149,19 +137,6 @@ const Login = () => {
                 disabled={loading}
               >
                 {loading ? <Spin indicator={<LoadingOutlined style={{ color: '#fff' }} />} /> : '登录'}
-              </button>
-
-              <div className={styles.divider}>
-                <span>或</span>
-              </div>
-
-              <button
-                type="button"
-                className={`cyber-button-ghost ${styles.submitButton}`}
-                onClick={handleThirdPartyLogin}
-                disabled={loading}
-              >
-                使用第三方账号登录
               </button>
             </form>
 

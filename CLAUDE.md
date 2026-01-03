@@ -27,7 +27,6 @@ python manage.py runserver              # 启动开发服务器 (端口 8000)
 python manage.py makemigrations         # 创建迁移文件
 python manage.py migrate                # 执行迁移
 python manage.py init_permissions       # 初始化角色和权限
-python init_data.py                     # 加载测试数据
 ```
 
 ### 前端（在 `frontend/` 目录下）

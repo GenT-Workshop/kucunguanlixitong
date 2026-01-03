@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { message, Spin, Table, Modal, Tag } from 'antd'
 import {
-  ThunderboltOutlined,
-  StarOutlined,
   PlusOutlined,
   SearchOutlined,
   ReloadOutlined,
@@ -15,7 +13,6 @@ import {
 } from '@ant-design/icons'
 import { createStockIn, getStockInList, getStockList, deleteStockIn, updateStockIn, stockInit } from '../api/stock'
 import type { StockIn as StockInType, Stock, StockInType as InType } from '../api/types'
-import { useAutoRefresh } from '../hooks/useAutoRefresh'
 import styles from './StockIn.module.css'
 
 // 入库类型选项
@@ -116,8 +113,7 @@ const StockIn = () => {
   }, [page, inTypeFilter, loadStockInList])
 
   // 自动刷新数据（每2秒）
-  useAutoRefresh(loadStockInList, { interval: 2000 })
-
+  
   // 搜索
   const handleSearch = () => {
     setPage(1)
