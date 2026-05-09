@@ -61,7 +61,7 @@ scripts/devbox-restart.sh
 它会用 Django 自带的开发服务器启动一个演示服务：
 
 ```bash
-0.0.0.0:8000
+0.0.0.0:8080
 ```
 
 前端和后端都由 Django 同一个端口提供：

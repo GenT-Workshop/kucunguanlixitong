@@ -3,7 +3,7 @@ set -euo pipefail
 
 RELEASE_DIR="${1:?usage: devbox-restart.sh RELEASE_DIR}"
 DEPLOY_PATH="${DEPLOY_PATH:-$(cd "$RELEASE_DIR/../.." && pwd)}"
-PORT="${PORT:-8000}"
+PORT="${PORT:-8080}"
 SHARED_DIR="$DEPLOY_PATH/shared"
 PID_FILE="$SHARED_DIR/django.pid"
 LOG_FILE="$SHARED_DIR/django.log"
