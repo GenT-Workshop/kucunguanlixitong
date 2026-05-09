@@ -112,7 +112,7 @@ jobs:
           tar -xzf "/tmp/kucun-${GITHUB_SHA}.tgz" -C "$RELEASE_DIR"
 
           rm -rf "$SHARED_DIR/venv.tmp"
-          if python3 -m venv "$SHARED_DIR/venv.tmp"; then
+          if python3 -c 'import ensurepip' >/dev/null 2>&1 && python3 -m venv "$SHARED_DIR/venv.tmp"; then
             rm -rf "$SHARED_DIR/venv"
             mv "$SHARED_DIR/venv.tmp" "$SHARED_DIR/venv"
             PYTHON_BIN="$SHARED_DIR/venv/bin/python"
