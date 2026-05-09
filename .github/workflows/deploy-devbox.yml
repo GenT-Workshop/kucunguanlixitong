@@ -166,6 +166,10 @@ jobs:
             DEPLOY_PATH="$DEPLOY_PATH" DB_NAME="$SHARED_DIR/db.sqlite3" PYTHON_BIN="$PYTHON_BIN" "$RELEASE_DIR/scripts/devbox-restart.sh" "$DEPLOY_PATH/current"
           fi
 
-          find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d | sort | head -n -5 | xargs -r rm -rf
+          find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d ! -path "$RELEASE_DIR" -printf '%T@ %p\n' \
+            | sort -rn \
+            | tail -n +5 \
+            | cut -d' ' -f2- \
+            | xargs -r rm -rf
           rm -f "/tmp/kucun-${GITHUB_SHA}.tgz"
           EOF
