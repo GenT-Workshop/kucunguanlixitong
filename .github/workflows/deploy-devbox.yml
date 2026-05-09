@@ -111,9 +111,22 @@ jobs:
           mkdir -p "$RELEASE_DIR"
           tar -xzf "/tmp/kucun-${GITHUB_SHA}.tgz" -C "$RELEASE_DIR"
 
-          python3 -m venv "$SHARED_DIR/venv"
-          "$SHARED_DIR/venv/bin/python" -m pip install --upgrade pip
-          "$SHARED_DIR/venv/bin/pip" install -r "$RELEASE_DIR/backend/requirements.txt"
+          rm -rf "$SHARED_DIR/venv.tmp"
+          if python3 -m venv "$SHARED_DIR/venv.tmp"; then
+            rm -rf "$SHARED_DIR/venv"
+            mv "$SHARED_DIR/venv.tmp" "$SHARED_DIR/venv"
+            PYTHON_BIN="$SHARED_DIR/venv/bin/python"
+            "$PYTHON_BIN" -m pip install --upgrade pip
+            "$PYTHON_BIN" -m pip install -r "$RELEASE_DIR/backend/requirements.txt"
+          else
+            rm -rf "$SHARED_DIR/venv.tmp"
+            PYTHON_BIN="$(command -v python3)"
+            if ! "$PYTHON_BIN" -m pip --version >/dev/null 2>&1; then
+              curl -fsSL https://bootstrap.pypa.io/get-pip.py -o "$SHARED_DIR/get-pip.py"
+              "$PYTHON_BIN" "$SHARED_DIR/get-pip.py" --user
+            fi
+            "$PYTHON_BIN" -m pip install --user -r "$RELEASE_DIR/backend/requirements.txt"
+          fi
 
           cd "$RELEASE_DIR/backend"
           export DJANGO_DEBUG="${DJANGO_DEBUG:-true}"
@@ -121,8 +134,8 @@ jobs:
           export DJANGO_CORS_ALLOW_ALL_ORIGINS="${DJANGO_CORS_ALLOW_ALL_ORIGINS:-true}"
           export DB_ENGINE="django.db.backends.sqlite3"
           export DB_NAME="$SHARED_DIR/db.sqlite3"
-          "$SHARED_DIR/venv/bin/python" manage.py migrate --noinput
-          "$SHARED_DIR/venv/bin/python" manage.py init_permissions || true
+          "$PYTHON_BIN" manage.py migrate --noinput
+          "$PYTHON_BIN" manage.py init_permissions || true
 
           ln -sfn "$RELEASE_DIR" "$DEPLOY_PATH/current"
 
@@ -130,7 +143,7 @@ jobs:
             "$DEPLOY_PATH/restart.sh" "$DEPLOY_PATH/current"
           else
             chmod +x "$RELEASE_DIR/scripts/devbox-restart.sh"
-            DEPLOY_PATH="$DEPLOY_PATH" DB_NAME="$SHARED_DIR/db.sqlite3" "$RELEASE_DIR/scripts/devbox-restart.sh" "$DEPLOY_PATH/current"
+            DEPLOY_PATH="$DEPLOY_PATH" DB_NAME="$SHARED_DIR/db.sqlite3" PYTHON_BIN="$PYTHON_BIN" "$RELEASE_DIR/scripts/devbox-restart.sh" "$DEPLOY_PATH/current"
           fi
 
           find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d | sort | head -n -5 | xargs -r rm -rf

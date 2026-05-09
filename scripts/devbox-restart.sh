@@ -7,7 +7,7 @@ PORT="${PORT:-8000}"
 SHARED_DIR="$DEPLOY_PATH/shared"
 PID_FILE="$SHARED_DIR/django.pid"
 LOG_FILE="$SHARED_DIR/django.log"
-PYTHON="$SHARED_DIR/venv/bin/python"
+PYTHON="${PYTHON_BIN:-$SHARED_DIR/venv/bin/python}"
 
 mkdir -p "$SHARED_DIR"
 
@@ -25,6 +25,9 @@ export DB_ENGINE="${DB_ENGINE:-django.db.backends.sqlite3}"
 export DB_NAME="${DB_NAME:-$SHARED_DIR/db.sqlite3}"
 
 cd "$RELEASE_DIR/backend"
+if [ ! -x "$PYTHON" ]; then
+  PYTHON="$(command -v python3)"
+fi
 nohup "$PYTHON" manage.py runserver "0.0.0.0:$PORT" > "$LOG_FILE" 2>&1 &
 echo "$!" > "$PID_FILE"
 
