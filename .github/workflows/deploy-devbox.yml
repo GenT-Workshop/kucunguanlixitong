@@ -111,18 +111,31 @@ jobs:
           mkdir -p "$RELEASE_DIR"
           tar -xzf "/tmp/kucun-${GITHUB_SHA}.tgz" -C "$RELEASE_DIR"
 
+          echo "Python runtime: $(python3 --version)"
+          if ! python3 -c 'import ensurepip' >/dev/null 2>&1 || ! python3 -m pip --version >/dev/null 2>&1; then
+            if command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; then
+              echo "Installing python3-venv and python3-pip with apt-get"
+              sudo -n apt-get update
+              sudo -n apt-get install -y python3-venv python3-pip
+            else
+              echo "No non-interactive sudo available; using user-level Python fallback"
+            fi
+          fi
+
           rm -rf "$SHARED_DIR/venv.tmp"
           if python3 -c 'import ensurepip' >/dev/null 2>&1 && python3 -m venv "$SHARED_DIR/venv.tmp"; then
+            echo "Using Python virtual environment"
             rm -rf "$SHARED_DIR/venv"
             mv "$SHARED_DIR/venv.tmp" "$SHARED_DIR/venv"
             PYTHON_BIN="$SHARED_DIR/venv/bin/python"
             "$PYTHON_BIN" -m pip install --upgrade pip
             "$PYTHON_BIN" -m pip install -r "$RELEASE_DIR/backend/requirements.txt"
           else
+            echo "Using system Python user site-packages"
             rm -rf "$SHARED_DIR/venv.tmp"
             PYTHON_BIN="$(command -v python3)"
             if ! "$PYTHON_BIN" -m pip --version >/dev/null 2>&1; then
-              curl -fsSL https://bootstrap.pypa.io/get-pip.py -o "$SHARED_DIR/get-pip.py"
+              curl --connect-timeout 15 --max-time 60 -fsSL https://bootstrap.pypa.io/get-pip.py -o "$SHARED_DIR/get-pip.py"
               "$PYTHON_BIN" "$SHARED_DIR/get-pip.py" --user
             fi
             "$PYTHON_BIN" -m pip install --user -r "$RELEASE_DIR/backend/requirements.txt"
