@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { message, Table, Modal, Input, Select, Tabs, Switch, Spin } from 'antd'
 import {
-  ThunderboltOutlined,
-  StarOutlined,
   SettingOutlined,
   UserOutlined,
   TeamOutlined,

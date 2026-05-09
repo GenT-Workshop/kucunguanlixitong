@@ -1,0 +1,138 @@
+name: Deploy to Devbox
+
+on:
+  push:
+    branches:
+      - main
+      - andemo
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-devbox
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: devbox
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Check backend dependencies
+        working-directory: backend
+        env:
+          DB_ENGINE: django.db.backends.sqlite3
+          DB_NAME: ":memory:"
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python manage.py check
+
+      - name: Package release
+        run: |
+          tar \
+            --exclude='.git' \
+            --exclude='backend/venv' \
+            --exclude='backend/db.sqlite3' \
+            --exclude='backend/*.sqlite3' \
+            --exclude='frontend/node_modules' \
+            --exclude='frontend/src' \
+            --exclude='frontend/public' \
+            --exclude='frontend/.vite' \
+            -czf release.tgz backend frontend/dist scripts/devbox-restart.sh
+
+      - name: Configure SSH
+        env:
+          DEVBOX_SSH_KEY: ${{ secrets.DEVBOX_SSH_KEY }}
+          DEVBOX_HOST: ${{ secrets.DEVBOX_HOST }}
+          DEVBOX_PORT: ${{ secrets.DEVBOX_PORT || '22' }}
+        run: |
+          test -n "$DEVBOX_SSH_KEY"
+          test -n "$DEVBOX_HOST"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$DEVBOX_SSH_KEY" > ~/.ssh/devbox_key
+          chmod 600 ~/.ssh/devbox_key
+          ssh-keyscan -p "$DEVBOX_PORT" "$DEVBOX_HOST" >> ~/.ssh/known_hosts
+
+      - name: Upload release
+        env:
+          DEVBOX_HOST: ${{ secrets.DEVBOX_HOST }}
+          DEVBOX_USER: ${{ secrets.DEVBOX_USER }}
+          DEVBOX_PORT: ${{ secrets.DEVBOX_PORT || '22' }}
+        run: |
+          test -n "$DEVBOX_USER"
+          scp -i ~/.ssh/devbox_key -P "$DEVBOX_PORT" release.tgz "$DEVBOX_USER@$DEVBOX_HOST:/tmp/kucun-${GITHUB_SHA}.tgz"
+
+      - name: Activate release
+        env:
+          DEVBOX_HOST: ${{ secrets.DEVBOX_HOST }}
+          DEVBOX_USER: ${{ secrets.DEVBOX_USER }}
+          DEVBOX_PORT: ${{ secrets.DEVBOX_PORT || '22' }}
+          DEVBOX_DEPLOY_PATH: ${{ secrets.DEVBOX_DEPLOY_PATH }}
+        run: |
+          test -n "$DEVBOX_DEPLOY_PATH"
+          ssh -i ~/.ssh/devbox_key -p "$DEVBOX_PORT" "$DEVBOX_USER@$DEVBOX_HOST" \
+            "GITHUB_SHA='$GITHUB_SHA' DEPLOY_PATH='$DEVBOX_DEPLOY_PATH' bash -s" <<'EOF'
+          set -euo pipefail
+
+          RELEASES_DIR="$DEPLOY_PATH/releases"
+          SHARED_DIR="$DEPLOY_PATH/shared"
+          RELEASE_DIR="$RELEASES_DIR/$GITHUB_SHA"
+
+          mkdir -p "$RELEASES_DIR" "$SHARED_DIR"
+          rm -rf "$RELEASE_DIR"
+          mkdir -p "$RELEASE_DIR"
+          tar -xzf "/tmp/kucun-${GITHUB_SHA}.tgz" -C "$RELEASE_DIR"
+
+          python3 -m venv "$SHARED_DIR/venv"
+          "$SHARED_DIR/venv/bin/python" -m pip install --upgrade pip
+          "$SHARED_DIR/venv/bin/pip" install -r "$RELEASE_DIR/backend/requirements.txt"
+
+          cd "$RELEASE_DIR/backend"
+          export DJANGO_DEBUG="${DJANGO_DEBUG:-true}"
+          export DJANGO_ALLOWED_HOSTS="${DJANGO_ALLOWED_HOSTS:-*}"
+          export DJANGO_CORS_ALLOW_ALL_ORIGINS="${DJANGO_CORS_ALLOW_ALL_ORIGINS:-true}"
+          export DB_ENGINE="django.db.backends.sqlite3"
+          export DB_NAME="$SHARED_DIR/db.sqlite3"
+          "$SHARED_DIR/venv/bin/python" manage.py migrate --noinput
+          "$SHARED_DIR/venv/bin/python" manage.py init_permissions || true
+
+          ln -sfn "$RELEASE_DIR" "$DEPLOY_PATH/current"
+
+          if [ -x "$DEPLOY_PATH/restart.sh" ]; then
+            "$DEPLOY_PATH/restart.sh" "$DEPLOY_PATH/current"
+          else
+            chmod +x "$RELEASE_DIR/scripts/devbox-restart.sh"
+            DEPLOY_PATH="$DEPLOY_PATH" DB_NAME="$SHARED_DIR/db.sqlite3" "$RELEASE_DIR/scripts/devbox-restart.sh" "$DEPLOY_PATH/current"
+          fi
+
+          find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d | sort | head -n -5 | xargs -r rm -rf
+          rm -f "/tmp/kucun-${GITHUB_SHA}.tgz"
+          EOF

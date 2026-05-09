@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { message, Table, Spin, Modal } from 'antd'
 import {
-  ThunderboltOutlined,
-  StarOutlined,
   ReloadOutlined,
   FileTextOutlined,
   EyeOutlined,
 } from '@ant-design/icons'
 import { getMonthlyReportList, getMonthlyReportDetail } from '../api/stock'
-import type { MonthlyReportItem, MonthlyReportDetail, MonthlyDetailItem } from '../api/types'
+import type { MonthlyReportItem, MonthlyReportDetail } from '../api/types'
 import styles from './MonthlyReport.module.css'
 
 const MonthlyReport = () => {

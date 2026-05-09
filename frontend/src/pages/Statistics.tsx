@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { message, Spin, Table } from 'antd'
+import { Spin, Table } from 'antd'
 import {
-  ThunderboltOutlined,
-  StarOutlined,
   ReloadOutlined,
   BarChartOutlined,
   InboxOutlined,
@@ -61,7 +59,15 @@ const Statistics = () => {
           const d = new Date(end)
           d.setDate(d.getDate() - i)
           const dateStr = d.toISOString().split('T')[0]
-          dateMap.set(dateStr, { date: dateStr, in_qty: 0, out_qty: 0 })
+          dateMap.set(dateStr, {
+            date: dateStr,
+            in_qty: 0,
+            in_value: '0',
+            in_count: 0,
+            out_qty: 0,
+            out_value: '0',
+            out_count: 0,
+          })
         }
 
         // 填充入库数据

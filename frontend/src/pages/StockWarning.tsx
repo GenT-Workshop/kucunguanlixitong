@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { message, Table, Tag, Spin } from 'antd'
 import {
-  ThunderboltOutlined,
-  StarOutlined,
   SearchOutlined,
   AlertOutlined,
   SyncOutlined,

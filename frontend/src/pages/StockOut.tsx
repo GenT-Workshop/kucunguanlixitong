@@ -2,9 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { message, Spin, Modal, Tag } from 'antd'
 import {
-  ThunderboltOutlined,
-  StarOutlined,
-  CameraOutlined,
   LoadingOutlined,
   SearchOutlined,
   PlusOutlined,
@@ -14,7 +11,6 @@ import {
 } from '@ant-design/icons'
 import { getStockOutList, createStockOut, deleteStockOut, updateStockOut, getStockList } from '../api/stock'
 import type { StockOut, Stock, StockOutType } from '../api/types'
-import { useAutoRefresh } from '../hooks/useAutoRefresh'
 import styles from './StockOut.module.css'
 
 // 出库类型选项
