@@ -36,6 +36,8 @@ Get-Content -Raw "C:\Users\anan123sz\Downloads\hzh.sealos.run_ns-69ja4of0_devbox
 $DEVBOX_DEPLOY_PATH/shared/db.sqlite3
 ```
 
+Devbox 部署时会优先使用 `backend/requirements-sqlite.txt`，避免为 SQLite 演示环境安装 PostgreSQL 驱动。
+
 每次发布的新代码会放到：
 
 ```bash

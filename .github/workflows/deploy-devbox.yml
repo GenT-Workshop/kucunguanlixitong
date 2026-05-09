@@ -105,6 +105,8 @@ jobs:
           RELEASES_DIR="$DEPLOY_PATH/releases"
           SHARED_DIR="$DEPLOY_PATH/shared"
           RELEASE_DIR="$RELEASES_DIR/$GITHUB_SHA"
+          PIP_INDEX_URL="${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}"
+          PIP_TRUSTED_HOST="${PIP_TRUSTED_HOST:-pypi.tuna.tsinghua.edu.cn}"
 
           mkdir -p "$RELEASES_DIR" "$SHARED_DIR"
           rm -rf "$RELEASE_DIR"
@@ -124,12 +126,17 @@ jobs:
           fi
 
           rm -rf "$SHARED_DIR/venv.tmp"
+          REQUIREMENTS_FILE="$RELEASE_DIR/backend/requirements-sqlite.txt"
+          if [ ! -f "$REQUIREMENTS_FILE" ]; then
+            REQUIREMENTS_FILE="$RELEASE_DIR/backend/requirements.txt"
+          fi
+
           if python3 -c 'import ensurepip' >/dev/null 2>&1 && python3 -m venv "$SHARED_DIR/venv.tmp"; then
             echo "Using Python virtual environment"
             rm -rf "$SHARED_DIR/venv"
             mv "$SHARED_DIR/venv.tmp" "$SHARED_DIR/venv"
             PYTHON_BIN="$SHARED_DIR/venv/bin/python"
-            "$PYTHON_BIN" -m pip install --no-cache-dir --timeout 60 -r "$RELEASE_DIR/backend/requirements.txt"
+            "$PYTHON_BIN" -m pip install --no-cache-dir --timeout 60 --retries 2 --index-url "$PIP_INDEX_URL" --trusted-host "$PIP_TRUSTED_HOST" -r "$REQUIREMENTS_FILE"
           else
             echo "Using system Python user site-packages"
             rm -rf "$SHARED_DIR/venv.tmp"
@@ -138,7 +145,7 @@ jobs:
               curl --connect-timeout 15 --max-time 60 -fsSL https://bootstrap.pypa.io/get-pip.py -o "$SHARED_DIR/get-pip.py"
               "$PYTHON_BIN" "$SHARED_DIR/get-pip.py" --user
             fi
-            "$PYTHON_BIN" -m pip install --user --no-cache-dir --timeout 60 -r "$RELEASE_DIR/backend/requirements.txt"
+            "$PYTHON_BIN" -m pip install --user --no-cache-dir --timeout 60 --retries 2 --index-url "$PIP_INDEX_URL" --trusted-host "$PIP_TRUSTED_HOST" -r "$REQUIREMENTS_FILE"
           fi
 
           cd "$RELEASE_DIR/backend"
